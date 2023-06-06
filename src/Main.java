@@ -57,6 +57,7 @@ public class Main {
                     System.out.println("Invalid Player Turn: " + e.getMessage());
                 }
             } else {
+
 //Submit a player card
                 UnoCard playerCard = playerHand.get(cardIndex);
                 try {

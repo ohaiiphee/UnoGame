@@ -279,7 +279,7 @@ public class Game {
     }
 }
 
-//class for when the wrong player tries to play
+//class for when the wrong player tries to play (check if really necessary)
 class InvalidPlayerTurnException extends Exception {
     String playerId;
 

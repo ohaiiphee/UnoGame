@@ -105,7 +105,7 @@ public class UnoDeck {
             throw new IllegalArgumentException("Can't draw " + n + "cards - deck only has " + cardsInDeck + " cards.");
         }
 
-//get better explanation for this part -- don't completely understand :')
+//decrease [i] cards on the deck (the ones given to the player)
         UnoCard[] ret = new UnoCard[n];
         for (int i = 0; i < n; i++) {
             ret[i] = cards[--cardsInDeck];
