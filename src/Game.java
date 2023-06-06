@@ -11,7 +11,7 @@ public class Game {
     //deck that the players are playing with
     private UnoDeck deck;
 
-    //every player's hand is an array of uno cards -- to keep track of every players' hand, we make an array list of an array list --> player hand is actually ALL of the players' hands
+    //every player's hand is an array of uno cards -- to keep track of every players' hand, we make an array list of an array list --> playerHand is actually ALL of the players' hands
     private ArrayList<ArrayList<UnoCard>> playerHand;
 
     //stockpile of cards we put down
