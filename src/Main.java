@@ -12,11 +12,13 @@ public class Main {
             Scanner scanner = new Scanner(System.in);
             numberPlayers = scanner.nextInt();
 
+
             if (numberPlayers >= 2 && numberPlayers <= 10) {
                 validInput = true;
             } else {
                 System.out.println("The number of players must be between 2 and 10. Please enter a number again.");
             }
+
         }
 
         Game game = new Game(numberPlayers);
@@ -47,34 +49,50 @@ public class Main {
 //Prompt the user for input
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the index of the card you want to play (or -1 to draw a card): ");
-            int cardIndex = scanner.nextInt();
+            String input = scanner.nextLine();
+            int cardIndex;
+            if (input.equals("uno")) {
+                System.out.println("UNO");
+            } else if (input.equals("help")) {
+                Game.helpMenu();
 
-            if (cardIndex == -1) {
-//Draw a card
+            }else {
                 try {
-                    game.submitDraw(currentPlayer);
-                } catch (InvalidPlayerTurnException e) {
-                    System.out.println("Invalid Player Turn: " + e.getMessage());
-                }
-            } else {
+
+                    cardIndex = Integer.parseInt(input);
+
+
+                    if (cardIndex == -1) {
+//Draw a card
+                        try {
+                            game.submitDraw(currentPlayer);
+                        } catch (InvalidPlayerTurnException e) {
+                            System.out.println("Invalid Player Turn: " + e.getMessage());
+                        }
+                    } else {
 
 //Submit a player card
-                UnoCard playerCard = playerHand.get(cardIndex);
-                try {
-                    game.submitPlayerCard(currentPlayer, playerCard, UnoCard.Color.RED);
-                } catch (InvalidColorSubmissionException e) {
-                    System.out.println("Invalid Color Submission: " + e.getMessage());
-                    System.out.println("You get an extra card - please play a valid card!");
-                    game.submitDraw(currentPlayer);
-                } catch (InvalidValueSubmissionException e) {
-                    System.out.println("Invalid Value Submission: " + e.getMessage());
-                    System.out.println("You get an extra card - please play a valid card!");
-                    game.submitDraw(currentPlayer);
-                } catch (InvalidPlayerTurnException e) {
-                    System.out.println("Invalid Player Turn: " + e.getMessage());
-                    System.out.println("You get an extra card - please play a valid card!");
-                    game.submitDraw(currentPlayer);
+                        UnoCard playerCard = playerHand.get(cardIndex);
+                        try {
+                            game.submitPlayerCard(currentPlayer, playerCard, UnoCard.Color.RED);
+                        } catch (InvalidColorSubmissionException e) {
+                            System.out.println("Invalid Color Submission: " + e.getMessage());
+                            System.out.println("You get an extra card - please play a valid card!");
+                            game.submitDraw(currentPlayer);
+                        } catch (InvalidValueSubmissionException e) {
+                            System.out.println("Invalid Value Submission: " + e.getMessage());
+                            System.out.println("You get an extra card - please play a valid card!");
+                            game.submitDraw(currentPlayer);
+                        } catch (InvalidPlayerTurnException e) {
+                            System.out.println("Invalid Player Turn: " + e.getMessage());
+                            System.out.println("You get an extra card - please play a valid card!");
+                            game.submitDraw(currentPlayer);
+                        }
+                    }
+                }catch (Exception e){
+                    System.out.println("Wrong input");
                 }
+
             }
 
 //Check if the game is over
