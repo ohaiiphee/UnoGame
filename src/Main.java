@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidPlayerTurnException {
 
         int numberPlayers = 0;
         boolean validInput = false;
@@ -40,8 +40,7 @@ public class Main {
 
 //Get player hand
             ArrayList<UnoCard> playerHand = game.getPlayerHand(currentPlayer);
-            System.out.println(currentPlayer+"'s cards: " + playerHand);
-
+            System.out.println(currentPlayer + "'s cards: " + playerHand);
 
 
 //Prompt the user for input
@@ -64,10 +63,16 @@ public class Main {
                     game.submitPlayerCard(currentPlayer, playerCard, UnoCard.Color.RED);
                 } catch (InvalidColorSubmissionException e) {
                     System.out.println("Invalid Color Submission: " + e.getMessage());
+                    System.out.println("You get an extra card - please play a valid card!");
+                    game.submitDraw(currentPlayer);
                 } catch (InvalidValueSubmissionException e) {
                     System.out.println("Invalid Value Submission: " + e.getMessage());
+                    System.out.println("You get an extra card - please play a valid card!");
+                    game.submitDraw(currentPlayer);
                 } catch (InvalidPlayerTurnException e) {
                     System.out.println("Invalid Player Turn: " + e.getMessage());
+                    System.out.println("You get an extra card - please play a valid card!");
+                    game.submitDraw(currentPlayer);
                 }
             }
 
