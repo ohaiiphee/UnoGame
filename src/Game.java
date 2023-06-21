@@ -291,6 +291,60 @@ class InvalidPlayerTurnException extends Exception {
     public String getPid() {
         return playerId;
     }
+    public static void helpMenu(String input) {
+        System.out.println("This is the help menu how can I help you?");
+        boolean help = true;
+        while (help) {
+            switch (input.toLowerCase()) {
+                case "help":
+                    System.out.println("This is the help menu how can I help you?");
+                    break;
+                case "play card":
+                    System.out.println("Enter the index number to play the card. The index starts with 0. ");
+                    break;
+                case "take card":
+                    System.out.println("Type -1");
+                    break;
+                case "+2":
+                    System.out.println("The next player has to take 2 Cards");
+                    break;
+                case "+4":
+                    System.out.println("You can choose a color und the next player has to take 4 Cards");
+                    break;
+                case "wildcard":
+                    System.out.println("You can choose a color");
+                    break;
+                case "objection":
+                    System.out.println("When you play a +4 the next player can challenge you. If you where able to play another card you have to draw the 4 cards yourself. " +
+                            "If you where unable to play another card the challenger has to draw the 6 cards.");
+                    break;
+                case "revers":
+                    System.out.println("Changes the direction of the game.");
+                    break;
+                case "skip":
+                    System.out.println("The next player has to skip his turn. ");
+                    break;
+                case "win":
+                    System.out.println("The first player how has an empty hand wins this round.");
+                    break;
+                case "points":
+                    System.out.println("If a player wins the round he gets points for every card in the other players hands.");
+                    System.out.println("Points for cards:");
+                    System.out.println("Numbercards: the number on it");
+                    System.out.println("+2, Skip and Reverse: 20 points per card");
+                    System.out.println("+4 and Wildcard: 50 per card");
+                    break;
+                case "end game":
+                    System.out.println("The game ends when one player get's 500 points or when type 'exit'.");
+                    break;
+                case "close":
+                    help = false;
+                    break;
+
+            }
+        }
+    }
+
 }
 
 //class for everytime someone submits a color that isn't the correct color
