@@ -24,7 +24,7 @@ public class Game {
     boolean gameDirection;
 
     public Game(int numberPlayers) {
-        if (numberPlayers < 2 || numberPlayers > 10) {
+        if(numberPlayers <2 || numberPlayers > 10){
             throw new IllegalArgumentException("Number of players must be between 2 and 10.");
         }
 
@@ -79,16 +79,6 @@ public class Game {
         if (card.getValue() == UnoCard.Value.Reverse) {
             System.out.println("The game direction has changed!");
             gameDirection ^= true; //^= --> will flip every time; if it's false it becomes true and vice-versa
-            if(playerIds.length == 2){
-                if (gameDirection == false) {
-                    currentPlayer = (currentPlayer + 1) % playerIds.length;
-                } else if (gameDirection == true) {
-                    currentPlayer = (currentPlayer - 1) % playerIds.length;
-                    if (currentPlayer == -1) {
-                        currentPlayer = playerIds.length - 1;
-                    }
-                }
-            }
             currentPlayer = playerIds.length - 1;
         }
 
@@ -192,11 +182,6 @@ public class Game {
             if (card.getValue() != validValue) {
                 throw new InvalidValueSubmissionException("Invalid move", card.getValue(), validValue);
             }
-
-            // Player played a wrong card, so they must play again
-            System.out.println("Invalid move. " + pid + " must play again.");
-            pHand.add(card);
-            return;
         }
 //if the player plays a wildColor card, scanner to let person choose a color/value
         if (card.getColor() == UnoCard.Color.BLACK) {
@@ -221,30 +206,25 @@ public class Game {
             }
         }
 
-        if (!validCardPlay(card)) {
-            pHand.add(card);
 
-        } else {
-            pHand.remove(card);
-            if (hasEmptyHand(this.playerIds[currentPlayer])) {
-                System.out.println(this.playerIds[currentPlayer] + " won the game! Thank you for playing.");
-                System.exit(0);
-            }
-
-            validColor = card.getColor();
-            validValue = card.getValue();
-            stockpile.add(card);
-
-            if (gameDirection == false) {
-                currentPlayer = (currentPlayer + 1) % playerIds.length;
-            } else if (gameDirection == true) {
-                currentPlayer = (currentPlayer - 1) % playerIds.length;
-                if (currentPlayer == -1) {
-                    currentPlayer = playerIds.length - 1;
-                }
-            }
+        pHand.remove(card);
+        if (hasEmptyHand(this.playerIds[currentPlayer])) {
+            System.out.println(this.playerIds[currentPlayer] + " won the game! Thank you for playing.");
+            System.exit(0);
         }
 
+        validColor = card.getColor();
+        validValue = card.getValue();
+        stockpile.add(card);
+
+        if (gameDirection == false) {
+            currentPlayer = (currentPlayer + 1) % playerIds.length;
+        } else if (gameDirection == true) {
+            currentPlayer = (currentPlayer - 1) % playerIds.length;
+            if (currentPlayer == -1) {
+                currentPlayer = playerIds.length - 1;
+            }
+        }
 
         if (card.getColor() == UnoCard.Color.BLACK) {
             validColor = declaredColor;
@@ -281,7 +261,6 @@ public class Game {
 
         if (card.getValue() == UnoCard.Value.Reverse) {
             System.out.println(pid + " changed the game direction.");
-
 
             gameDirection ^= true;
             if (gameDirection == true) {
