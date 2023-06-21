@@ -31,6 +31,8 @@ public class UnoCard {
 
     protected int points;
 
+    protected int numberHandCards;
+
     public UnoCard(Color color, Value value) {
         this.color = color;
         this.value = value;
@@ -40,9 +42,19 @@ public class UnoCard {
         return this.color;
     }
 
+    public int getNumberHandCards() {
+        return this.numberHandCards;
+    }
+
+    public void setNumberHandCards(int numberHandCards) {
+        this.numberHandCards = numberHandCards;
+    }
+
     public Value getValue() {
         return this.value;
     }
+
+
 
     public int getPoints() {
         return this.points;

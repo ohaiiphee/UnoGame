@@ -40,7 +40,8 @@ public class Main {
 
 //Get player hand
             ArrayList<UnoCard> playerHand = game.getPlayerHand(currentPlayer);
-            System.out.println(currentPlayer + "'s cards: " + playerHand);
+            topCard.setNumberHandCards(playerHand.size());
+            System.out.println(currentPlayer + "'s cards: ("+  topCard.getNumberHandCards()+ ") "+ playerHand);
 
 
 //Prompt the user for input
