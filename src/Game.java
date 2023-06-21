@@ -79,6 +79,16 @@ public class Game {
         if (card.getValue() == UnoCard.Value.Reverse) {
             System.out.println("The game direction has changed!");
             gameDirection ^= true; //^= --> will flip every time; if it's false it becomes true and vice-versa
+            if(playerIds.length == 2){
+                if (gameDirection == false) {
+                    currentPlayer = (currentPlayer + 1) % playerIds.length;
+                } else if (gameDirection == true) {
+                    currentPlayer = (currentPlayer - 1) % playerIds.length;
+                    if (currentPlayer == -1) {
+                        currentPlayer = playerIds.length - 1;
+                    }
+                }
+            }
             currentPlayer = playerIds.length - 1;
         }
 
@@ -271,6 +281,7 @@ public class Game {
 
         if (card.getValue() == UnoCard.Value.Reverse) {
             System.out.println(pid + " changed the game direction.");
+
 
             gameDirection ^= true;
             if (gameDirection == true) {
