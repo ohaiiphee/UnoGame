@@ -20,6 +20,8 @@ public class Game {
     private UnoCard.Color validColor;
     private UnoCard.Value validValue;
 
+
+
     //to keep track of the game direction (clockwise/counter clockwise)
     boolean gameDirection;
 
@@ -287,70 +289,75 @@ public class Game {
         System.out.println("If you want to close the help menu enter keyword 'Close'");
 
         String input = scan.nextLine();
-        boolean help = true;
+        boolean exit = true;
 
-            switch (input.toLowerCase()) {
-                case "help":
-                    helpMenu();
-                    break;
-                case "play card":
-                    System.out.println("Enter the index number to play the card. The index starts with 0. ");
-                    helpMenu();
-                    break;
-                case "take card":
-                    System.out.println("Type -1");
-                    helpMenu();
-                    break;
-                case "+2":
-                    System.out.println("The next player has to take 2 Cards");
-                    helpMenu();
-                    break;
-                case "+4":
-                    System.out.println("You can choose a color und the next player has to take 4 Cards");
-                    helpMenu();
-                    break;
-                case "wildcard":
-                    System.out.println("You can choose a color");
-                    helpMenu();
-                    break;
-                case "objection":
-                    System.out.println("When you play a +4 the next player can challenge you. If you where able to play another card you have to draw the 4 cards yourself. " +
-                            "If you where unable to play another card the challenger has to draw the 6 cards.");
-                    helpMenu();
-                    break;
-                case "revers":
-                    System.out.println("Changes the direction of the game.");
-                    helpMenu();
-                    break;
-                case "skip":
-                    System.out.println("The next player has to skip his turn. ");
-                    helpMenu();
-                    break;
-                case "win":
-                    System.out.println("The first player how has an empty hand wins this round.");
-                    helpMenu();
-                    break;
-                case "points":
-                    System.out.println("If a player wins the round he gets points for every card in the other players hands.");
-                    System.out.println("Points for cards:");
-                    System.out.println("Numbercards: the number on it");
-                    System.out.println("+2, Skip and Reverse: 20 points per card");
-                    System.out.println("+4 and Wildcard: 50 per card");
-                    helpMenu();
-                    break;
-                case "end game":
-                    System.out.println("The game ends when one player get's 500 points or when type 'exit'.");
-                    helpMenu();
-                    break;
-                case "close":
-                    help = false;
-                    break;
-                default:
-                    System.out.println("Sorry i couldn't understand you");
-                    helpMenu();
+        switch (input.toLowerCase()) {
+            case "help":
+                helpMenu();
+                break;
+            case "play card":
+                System.out.println("Enter the index number to play the card. The index starts with 0. ");
+                helpMenu();
+                break;
+            case "take card":
+                System.out.println("Type -1");
+                helpMenu();
+                break;
+            case "+2":
+                System.out.println("The next player has to take 2 Cards");
+                helpMenu();
+                break;
+            case "+4":
+                System.out.println("You can choose a color und the next player has to take 4 Cards");
+                helpMenu();
+                break;
+            case "wildcard":
+                System.out.println("You can choose a color");
+                helpMenu();
+                break;
+            case "objection":
+                System.out.println("When you play a +4 the next player can challenge you. If you were able to play another card you have to draw the 4 cards yourself. " +
+                        "If you were unable to play another card the challenger has to draw the 6 cards.");
+                helpMenu();
+                break;
+            case "revers":
+                System.out.println("Changes the direction of the game.");
+                helpMenu();
+                break;
+            case "skip":
+                System.out.println("The next player has to skip his turn. ");
+                helpMenu();
+                break;
+            case "win":
+                System.out.println("The first player how has an empty hand wins this round.");
+                helpMenu();
+                break;
+            case "points":
+                System.out.println("If a player wins the round they get points for every card in the other players hands.");
+                System.out.println("Points for cards:");
+                System.out.println("Numbercards: the number on it");
+                System.out.println("+2, Skip and Reverse: 20 points per card");
+                System.out.println("+4 and Wildcard: 50 per card");
+                helpMenu();
+                break;
+            case "end game":
+                System.out.println("The game ends when one player gets 500 points or when type 'exit'.");
+                helpMenu();
+                break;
+            case "close":
+                System.out.println("Until next time :)");
+                break;
+            case "exit":
+                boolean exitgame = true;
+                break;
+            default:
+                System.out.println("Sorry i couldn't understand you");
+                helpMenu();
 
-            }
         }
+    }
+
+
 
 }
 

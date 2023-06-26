@@ -29,6 +29,8 @@ public class Main {
 
 //Game loop
         boolean gameOver = false;
+        boolean gameExit = false;
+
         while (!gameOver) {
 //Get the top card
             UnoCard topCard = game.getTopCard();
@@ -43,20 +45,22 @@ public class Main {
 //Get player hand
             ArrayList<UnoCard> playerHand = game.getPlayerHand(currentPlayer);
             topCard.setNumberHandCards(playerHand.size());
-            System.out.println(currentPlayer + "'s cards: ("+  topCard.getNumberHandCards()+ ") "+ playerHand);
+            System.out.println(currentPlayer + "'s cards: (" + topCard.getNumberHandCards() + ") " + playerHand);
 
 
 //Prompt the user for input
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the index of the card you want to play (or -1 to draw a card): ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().toLowerCase();
             int cardIndex;
             if (input.equals("uno")) {
                 System.out.println("UNO");
             } else if (input.equals("help")) {
                 Game.helpMenu();
 
-            }else {
+            } else if (input.equals("exit")) {
+                gameExit = true;
+            } else {
                 try {
 
                     cardIndex = Integer.parseInt(input);
@@ -89,18 +93,22 @@ public class Main {
                             game.submitDraw(currentPlayer);
                         }
                     }
-                }catch (Exception e){
-                    System.out.println("Wrong input");
+                } catch (Exception e) {
+                    System.out.println("If you don't know how to play try tipping 'help'");
                 }
 
             }
 
 //Check if the game is over
-            gameOver = game.isGameOver();
+            if (gameExit || game.isGameOver()) {
+                gameOver = true;
+            }
+
 
 //Continue playing until someone has 0 cards!
         }
 
         System.out.println("Game Over. Thank you for playing!");
     }
+
 }
