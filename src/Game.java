@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 public class Game {
     private int currentPlayer;
+    private int currentPlayerPoints;
 
     //String array of the names of the players
     private String[] playerIds;
@@ -211,6 +212,8 @@ public class Game {
 
 
         pHand.remove(card);
+
+
         if (hasEmptyHand(this.playerIds[currentPlayer])) {
             System.out.println(this.playerIds[currentPlayer] + " won the game! Thank you for playing.");
             System.exit(0);
