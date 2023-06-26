@@ -4,7 +4,9 @@ import java.util.Scanner;
 
 public class Game {
     private int currentPlayer;
-    private int currentPlayerPoints;
+    private int currentPlayerPoints; //for later rounds --> you can always see how many points the current player has
+
+    private int pointsThisRound;
 
     //String array of the names of the players
     private String[] playerIds;
@@ -27,8 +29,8 @@ public class Game {
     boolean gameDirection;
 
     public Game(int numberPlayers) {
-        if(numberPlayers <2 || numberPlayers > 10){
-            throw new IllegalArgumentException("Number of players must be between 2 and 10.");
+        if(numberPlayers <2 || numberPlayers > 5){
+            throw new IllegalArgumentException("Number of players must be between 2 and 4.");
         }
 
         deck = new UnoDeck();
@@ -39,6 +41,7 @@ public class Game {
         playerIds = new String[numberPlayers];
         for (int i = 0; i < numberPlayers; i++) {
             System.out.print("Enter the name of player " + (i + 1) + ": ");
+            System.out.println(" ");
             Scanner scanner = new Scanner(System.in);
             playerIds[i] = scanner.nextLine();
         }
@@ -187,6 +190,7 @@ public class Game {
                 throw new InvalidValueSubmissionException("Invalid move", card.getValue(), validValue);
             }
         }
+
 //if the player plays a wildColor card, scanner to let person choose a color/value
         if (card.getColor() == UnoCard.Color.BLACK) {
             System.out.println("Choose the color (Red, Blue, Green, Yellow) that the next player must play:");
@@ -210,9 +214,7 @@ public class Game {
             }
         }
 
-
         pHand.remove(card);
-
 
         if (hasEmptyHand(this.playerIds[currentPlayer])) {
             System.out.println(this.playerIds[currentPlayer] + " won the game! Thank you for playing.");
@@ -286,13 +288,14 @@ public class Game {
 
     public static void helpMenu() {
         Scanner scan = new Scanner(System.in);
+        System.out.println(" ");
         System.out.println("This is the help menu how can I help you?");
         System.out.println("Here are all keywords:");
         System.out.println("Play Card, Take Card, +2, +4, Wildcard, Objection, Revers, skip, Win, Points, End Game");
         System.out.println("If you want to close the help menu enter keyword 'Close'");
+        System.out.println(" ");
 
         String input = scan.nextLine();
-        boolean exit = true;
 
         switch (input.toLowerCase()) {
             case "help":
@@ -349,9 +352,6 @@ public class Game {
                 break;
             case "close":
                 System.out.println("Until next time :)");
-                break;
-            case "exit":
-                boolean exitgame = true;
                 break;
             default:
                 System.out.println("Sorry i couldn't understand you");

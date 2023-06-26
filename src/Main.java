@@ -9,14 +9,15 @@ public class Main {
 
         while (!validInput) {
             System.out.print("Enter the number of players: ");
+            System.out.println(" ");
             Scanner scanner = new Scanner(System.in);
             numberPlayers = scanner.nextInt();
 
 
-            if (numberPlayers >= 2 && numberPlayers <= 10) {
+            if (numberPlayers >= 2 && numberPlayers <= 4) {
                 validInput = true;
             } else {
-                System.out.println("The number of players must be between 2 and 10. Please enter a number again.");
+                System.out.println("The number of players must be between 2 and 4. Please enter a number again.");
             }
 
         }
@@ -34,6 +35,7 @@ public class Main {
         while (!gameOver) {
 //Get the top card
             UnoCard topCard = game.getTopCard();
+            System.out.println(" ");
             System.out.println("Top Card: " + topCard);
 
 
