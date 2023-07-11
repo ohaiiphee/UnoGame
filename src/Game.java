@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Game {
@@ -8,6 +9,8 @@ public class Game {
 
     private int pointsThisRound;
 
+    int totalNumberPlayers;
+
     //String array of the names of the players
     private String[] playerIds;
 
@@ -15,7 +18,7 @@ public class Game {
     private UnoDeck deck;
 
     //every player's hand is an array of uno cards -- to keep track of every players' hand, we make an array list of an array list --> playerHand is actually ALL of the players' hands
-    private ArrayList<ArrayList<UnoCard>> playerHand;
+    private ArrayList<ArrayList<UnoCard>> playersHands;
 
     //stockpile of cards we put down
     private ArrayList<UnoCard> stockpile;
@@ -23,13 +26,35 @@ public class Game {
     private UnoCard.Color validColor;
     private UnoCard.Value validValue;
 
+    //hashMap to keep player IDs and points
+    private HashMap<String, Integer> playerPoints;
 
+
+    public void setPlayerPoints(HashMap<String, Integer> playerPoints) {
+        this.playerPoints = playerPoints;
+    }
 
     //to keep track of the game direction (clockwise/counter clockwise)
     boolean gameDirection;
 
-    public Game(int numberPlayers) {
-        if(numberPlayers <2 || numberPlayers > 5){
+    public Game(int totalNumberPlayers, int numberHumanPlayers) {
+        this.totalNumberPlayers = totalNumberPlayers;
+
+        playerIds = new String[totalNumberPlayers];
+        for (int i = 0; i < numberHumanPlayers; i++) {
+            System.out.print("Enter the name of player " + (i + 1) + ": ");
+            System.out.println(" ");
+            Scanner scanner = new Scanner(System.in);
+            playerIds[i] = scanner.nextLine();
+        }
+        for (int i = numberHumanPlayers; i < (totalNumberPlayers); i++) {
+            playerIds[i] = "Bot_" + (i+1);
+        }
+
+    }
+
+    public void startVorbereitung(int totalNumberPlayers) {
+        if (totalNumberPlayers < 2 || totalNumberPlayers > 5) {
             throw new IllegalArgumentException("Number of players must be between 2 and 4.");
         }
 
@@ -38,27 +63,20 @@ public class Game {
         deck.shuffle();
         stockpile = new ArrayList<UnoCard>();
 
-        playerIds = new String[numberPlayers];
-        for (int i = 0; i < numberPlayers; i++) {
-            System.out.print("Enter the name of player " + (i + 1) + ": ");
-            System.out.println(" ");
-            Scanner scanner = new Scanner(System.in);
-            playerIds[i] = scanner.nextLine();
-        }
-
         currentPlayer = 0;
         gameDirection = false; //standard game direction
 
-        playerHand = new ArrayList<ArrayList<UnoCard>>();
-        for (int i = 0; i < numberPlayers; i++) {
-            //create a hand of uno cards and fill it with cards from the deck
-            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(7)));
-            playerHand.add(hand); //keeps track of all players' hands
+        playersHands = new ArrayList<ArrayList<UnoCard>>();
+        for (int i = 0; i < totalNumberPlayers; i++) {
+            //array with how many cards a player starts with
+            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(1))); //change back to 7, FOR TESTING PURPOSES ONLY
+            playersHands.add(hand); //keeps track of all players' hands
         }
     }
 
     public void start(Game game) {
         //first thing we do in the game --> get a card from the deck
+        startVorbereitung(totalNumberPlayers);
         UnoCard card = deck.drawCard();
         //check which color/value player can play --> color/value of the previous card
         validColor = card.getColor();
@@ -124,7 +142,7 @@ public class Game {
 
     public ArrayList<UnoCard> getPlayerHand(String pid) {
         int index = Arrays.asList(playerIds).indexOf(pid);
-        return playerHand.get(index);
+        return playersHands.get(index);
     }
 
     public int getPlayerHandSize(String pid) {
@@ -217,7 +235,20 @@ public class Game {
         pHand.remove(card);
 
         if (hasEmptyHand(this.playerIds[currentPlayer])) {
-            System.out.println(this.playerIds[currentPlayer] + " won the game! Thank you for playing.");
+            System.out.println(this.playerIds[currentPlayer] + " won this round!");
+
+            //TODO:check why this isn't working :(
+
+//            // Give the winning player points based on the other players' handcards
+            int winningPlayerPoints = calculatePoints(this.playerIds[currentPlayer]);
+            playerPoints.put(this.playerIds[currentPlayer], winningPlayerPoints);
+
+//            // Print the points for each player
+            for (String player : playerIds) {
+                System.out.println("I am here");
+                System.out.println(player + " has " + playerPoints.get(player) + " points.");
+            }
+
             System.exit(0);
         }
 
@@ -291,7 +322,8 @@ public class Game {
         System.out.println(" ");
         System.out.println("This is the help menu how can I help you?");
         System.out.println("Here are all keywords:");
-        System.out.println("Play Card, Take Card, +2, +4, Wildcard, Objection, Revers, skip, Win, Points, End Game");
+        System.out.println("Play Card, Take Card, +2, +4, Wildcard, Objection, Reverse, skip, Win, Points, UNO, End Game");
+        System.out.println("Enter 'Score' to see the current score");
         System.out.println("If you want to close the help menu enter keyword 'Close'");
         System.out.println(" ");
 
@@ -326,7 +358,7 @@ public class Game {
                         "If you were unable to play another card the challenger has to draw the 6 cards.");
                 helpMenu();
                 break;
-            case "revers":
+            case "reverse":
                 System.out.println("Changes the direction of the game.");
                 helpMenu();
                 break;
@@ -350,6 +382,14 @@ public class Game {
                 System.out.println("The game ends when one player gets 500 points or when type 'exit'.");
                 helpMenu();
                 break;
+            case "score":
+                System.out.println("Current points for each player: ");
+                helpMenu();
+                break;
+            case "uno":
+                System.out.println("When a player only has one card, they should say 'UNO' - if you don't, you'll get 1 extra card as a penalty!");
+                helpMenu();
+                break;
             case "close":
                 System.out.println("Until next time :)");
                 break;
@@ -361,8 +401,22 @@ public class Game {
     }
 
 
+    private int calculatePoints(String pid) {
+        int points = 0;
+        for (String player : playerIds) {
+            if (!player.equals(pid)) {
+                ArrayList<UnoCard> hand = getPlayerHand(player);
+                for (UnoCard card : hand) {
+                    points += card.getPoints();
+                }
+            }
+        }
+        return points;
+    }
+
 
 }
+
 
 //class for when the wrong player tries to play (check if really necessary)
 class InvalidPlayerTurnException extends Exception {
@@ -376,8 +430,6 @@ class InvalidPlayerTurnException extends Exception {
     public String getPid() {
         return playerId;
     }
-
-
 }
 
 //class for everytime someone submits a color that isn't the correct color
@@ -396,7 +448,6 @@ class InvalidColorSubmissionException extends Exception {
         return super.getMessage() + " (Actual: " + actual + ", Expected: " + expected + ")";
     }
 }
-
 
 
 //class for everytime someone submits a value that isn't the correct value
