@@ -67,11 +67,12 @@ public class Main {
 
 
 //TODO: Prompt the bot for input
-            if(currentPlayer.toLowerCase().contains("bot")){
+            if (currentPlayer.toLowerCase().contains("bot")) {
                 System.out.println("I'm a bot and it's my turn :)");
-                if(playerHand.size()==1){
+                if (playerHand.size() == 1) {
                     System.out.println("UNO!");
                 }
+
 
 
 
@@ -83,8 +84,17 @@ public class Main {
             String input = scanner.nextLine().toLowerCase();
 
             int cardIndex;
-            if (input.equals("uno")) {
+
+
+            if (input.equals("uno") && playerHand.size() == 1) {
                 System.out.println("UNO!");
+            } else if (input.equals("uno") && playerHand.size() != 1) {
+                System.out.println("You have more than 1 card in your hand!");
+
+                //not working properly - user gets a card even if they call uno/after calling uno and trying to do -1
+            } else if ((!input.equals("uno") && playerHand.size() == 1) && ((!input.equals(-1) || !input.equals("help")))){
+                System.out.println("You forgot to say UNO - you get an extra card!");
+                game.submitDraw(currentPlayer);
             } else if (input.equals("help")) {
                 Game.helpMenu();
 
