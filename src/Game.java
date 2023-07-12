@@ -5,11 +5,15 @@ import java.util.Scanner;
 
 public class Game {
     private int currentPlayer;
+
+    boolean hasValidCardForPlus4Check = false; //for the +4 challenge check
     private int currentPlayerPoints; //for later rounds --> you can always see how many points the current player has
 
     private int pointsThisRound;
 
     int totalNumberPlayers;
+
+    String challengeChoice;
 
     //String array of the names of the players
     private String[] playerIds;
@@ -48,7 +52,7 @@ public class Game {
             playerIds[i] = scanner.nextLine();
         }
         for (int i = numberHumanPlayers; i < (totalNumberPlayers); i++) {
-            playerIds[i] = "Bot_" + (i+1);
+            playerIds[i] = "Bot_" + (i + 1);
         }
 
     }
@@ -69,7 +73,7 @@ public class Game {
         playersHands = new ArrayList<ArrayList<UnoCard>>();
         for (int i = 0; i < totalNumberPlayers; i++) {
             //array with how many cards a player starts with
-            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(7))); //change back to 7, FOR TESTING PURPOSES ONLY
+            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(3))); //change back to 7, FOR TESTING PURPOSES ONLY
             playersHands.add(hand); //keeps track of all players' hands
         }
     }
@@ -129,9 +133,33 @@ public class Game {
     }
 
     public String getPreviousPlayer(int i) {
+        //get previous player normal verlauf
         int index = this.currentPlayer - 1;
         if (index == -1) {
-            index = playerIds.length - 1;
+            index = playerIds.length + 4;
+        }
+        //get previous player reverse verlauf
+        if(gameDirection){
+            index = this.currentPlayer + 1;
+            if (index == 4) {
+                index = playerIds.length - 4; //goes back to index 0 (first player)
+            }
+        }
+        return this.playerIds[index];
+    }
+
+    public String getNextPlayer(int i) {
+        //get next player normal verlauf
+        int index = this.currentPlayer + 1;
+        if (index == 4) {
+            index = playerIds.length - 4; //goes back to index 0 (first player)
+        }
+        //get next player reverse verlauf
+        if (gameDirection) {
+            index = this.currentPlayer - 1;
+            if (index == -1) {
+                index = playerIds.length + 4;
+            }
         }
         return this.playerIds[index];
     }
@@ -194,6 +222,7 @@ public class Game {
     public void submitPlayerCard(String pid, UnoCard card, UnoCard.Color declaredColor)
             throws InvalidColorSubmissionException, InvalidValueSubmissionException, InvalidPlayerTurnException {
         checkPlayerTurn(pid);
+        hasValidCardForPlus4Check = false; //resets everytime a card is played
         ArrayList<UnoCard> pHand = getPlayerHand(pid);
 
         if (!validCardPlay(card)) {
@@ -211,9 +240,46 @@ public class Game {
 
 //if the player plays a wildColor card, scanner to let person choose a color/value
         if (card.getColor() == UnoCard.Color.BLACK) {
+
+            //if the player plays a +4, next player is asked if they want to challenge
+            if (card.getValue() == UnoCard.Value.DrawFour) {
+                System.out.println(pid + " wants to play a +4!");
+                System.out.println(getNextPlayer(currentPlayer) + ", would you like to challenge the +4?");
+                Scanner input = new Scanner(System.in);
+                challengeChoice = input.nextLine();
+
+                while(!challengeChoice.equalsIgnoreCase("no") && !challengeChoice.equalsIgnoreCase("yes")){
+                    System.out.println("please answer yes or no...");
+                    challengeChoice = input.nextLine();
+                }
+                if (challengeChoice.equalsIgnoreCase("no")) {
+                    System.out.println(getNextPlayer(currentPlayer) + " doesn't want to challenge the card - continue...");
+                } else if (challengeChoice.equalsIgnoreCase("yes")) {
+                    System.out.println("We have a challenge!");
+
+                    pid = playerIds[currentPlayer];
+                    ArrayList<UnoCard> playerHand = getPlayerHand(pid);
+
+                    for (UnoCard playerCard : playerHand) {
+                        //TODO: check why this always returns true
+                        if (playerCard.getColor().equals(getTopCard().getColor()) || playerCard.getValue().equals(getTopCard().getValue())) {
+                            hasValidCardForPlus4Check = true;
+                            break;
+                        }
+                    }
+                    if (hasValidCardForPlus4Check) {
+                        System.out.println("Good choice, " + getNextPlayer(currentPlayer) + "! " + pid + " did have another card they could have played - they get the 4 cards.");
+                    } else {
+                        System.out.println("Bad choice, " + getNextPlayer(currentPlayer) + "... " + pid + "'s move was legit. You get 6 cards!");
+                        //Add stuff to make 6 cards go to next player and move on
+                    }
+                }
+            }
+
             System.out.println("Choose the color (Red, Blue, Green, Yellow) that the next player must play:");
             Scanner scanner = new Scanner(System.in);
             String choice = scanner.nextLine();
+
 
             boolean validChoice = false;
             UnoCard.Color chosenColor = null;
@@ -277,12 +343,35 @@ public class Game {
         }
 
         if (card.getValue() == UnoCard.Value.DrawFour) {
-            pid = playerIds[currentPlayer];
-            getPlayerHand(pid).add(deck.drawCard());
-            getPlayerHand(pid).add(deck.drawCard());
-            getPlayerHand(pid).add(deck.drawCard());
-            getPlayerHand(pid).add(deck.drawCard());
-            System.out.println(pid + " drew 4 cards.");
+            //if during the +4 check the current player had another card they could play:
+            if(hasValidCardForPlus4Check){
+                pid = getPreviousPlayer(currentPlayer);
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                System.out.println(pid + " drew 4 cards.");
+
+                //if during the +4 check the current player didn't have another card that they could play:
+            } else if(challengeChoice.equalsIgnoreCase("yes") && !hasValidCardForPlus4Check){
+                pid = playerIds[currentPlayer];
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                System.out.println(pid + " drew 6 cards.");
+
+                //if next player decides to not challenge the +4
+            } else {
+                pid = playerIds[currentPlayer];
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                getPlayerHand(pid).add(deck.drawCard());
+                System.out.println(pid + " drew 4 cards.");
+            }
         }
 
         if (card.getValue() == UnoCard.Value.Skip) {
