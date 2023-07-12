@@ -69,7 +69,7 @@ public class Game {
         playersHands = new ArrayList<ArrayList<UnoCard>>();
         for (int i = 0; i < totalNumberPlayers; i++) {
             //array with how many cards a player starts with
-            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(1))); //change back to 7, FOR TESTING PURPOSES ONLY
+            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(7))); //change back to 7, FOR TESTING PURPOSES ONLY
             playersHands.add(hand); //keeps track of all players' hands
         }
     }
@@ -418,51 +418,7 @@ public class Game {
 }
 
 
-//class for when the wrong player tries to play (check if really necessary)
-class InvalidPlayerTurnException extends Exception {
-    String playerId;
-
-    public InvalidPlayerTurnException(String message, String pid) {
-        super(message);
-        playerId = pid;
-    }
-
-    public String getPid() {
-        return playerId;
-    }
-}
-
-//class for everytime someone submits a color that isn't the correct color
-class InvalidColorSubmissionException extends Exception {
-    private UnoCard.Color expected;
-    private UnoCard.Color actual;
-
-    public InvalidColorSubmissionException(String message, UnoCard.Color actual, UnoCard.Color expected) {
-        super(message);
-        this.actual = actual;
-        this.expected = expected;
-    }
-
-    @Override
-    public String getMessage() {
-        return super.getMessage() + " (Actual: " + actual + ", Expected: " + expected + ")";
-    }
-}
 
 
-//class for everytime someone submits a value that isn't the correct value
-class InvalidValueSubmissionException extends Exception {
-    private UnoCard.Value expected;
-    private UnoCard.Value actual;
 
-    public InvalidValueSubmissionException(String message, UnoCard.Value actual, UnoCard.Value expected) {
-        super(message);
-        this.actual = actual;
-        this.expected = expected;
-    }
 
-    @Override
-    public String getMessage() {
-        return super.getMessage() + " (Actual: " + actual + ", Expected: " + expected + ")";
-    }
-}

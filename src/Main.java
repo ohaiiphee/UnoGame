@@ -65,41 +65,84 @@ public class Main {
 
             System.out.println(currentPlayer + "'s cards: (" + topCard.getNumberHandCards() + ") " + playerHand);
 
-
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter the index of the card you want to play (or -1 to draw a card): ");
+            String input = null;
 //TODO: Prompt the bot for input
             if (currentPlayer.toLowerCase().contains("bot")) {
                 System.out.println("I'm a bot and it's my turn :)");
-                if (playerHand.size() == 1) {
-                    System.out.println("UNO!");
+                for (int i = 0; i < playerHand.size(); i++) {
+                    if (playerHand.size() == 1) {
+                        input = "uno";
+                    }
+                    for (int j = 0; j < playerHand.size(); j++) {
+                        if (playerHand.get(j).getColor().equals(game.getTopCard().getColor())) {
+                            input = String.valueOf(j);
+
+                        }
+
+
+                        UnoCard playerCard2 = playerHand.get(i);
+                        if (game.validCardPlay(playerCard2)) {
+                            try {
+                                game.submitPlayerCard(currentPlayer, playerCard2, UnoCard.Color.RED);
+                            } catch (InvalidColorSubmissionException e) {
+                                throw new RuntimeException(e);
+                            } catch (InvalidValueSubmissionException e) {
+                                throw new RuntimeException(e);
+                            }
+                            //if bot plays a wildColor, make it choose a color randomly
+                            if (playerCard2.getColor() == UnoCard.Color.BLACK) {
+                                System.out.println(currentPlayer + " is choosing a color...");
+                                int randomColor;
+                                while ((randomColor = (int) Math.random() * 10) < 5) ;
+
+                                switch (randomColor) {
+                                    case 1:
+                                        input = "Red";
+                                        break;
+                                    case 2:
+                                        input = "Blue";
+                                        break;
+                                    case 3:
+                                        input = "Green";
+                                        break;
+                                    case 4:
+                                        input = "Yellow";
+                                        break;
+                                }
+                            }
+                        } else {
+                            //if bot has no cards to play, it takes a card
+                            input = "-1";
+                            break;
+                        }
+                    }
                 }
-
-
-
-
+            }
+            if (!currentPlayer.toLowerCase().contains("bot")) {
+                input = scanner.nextLine().toLowerCase();
             }
 
 //Prompt the user for input
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Enter the index of the card you want to play (or -1 to draw a card): ");
-            String input = scanner.nextLine().toLowerCase();
+
 
             int cardIndex;
 
+            if (input.equals("help")) {
+                Game.helpMenu();
 
-            if (input.equals("uno") && playerHand.size() == 1) {
+            } else if (input.equals("exit")) {
+                gameExit = true;
+            } else if (input.equals("uno") && playerHand.size() == 1) {
                 System.out.println("UNO!");
             } else if (input.equals("uno") && playerHand.size() != 1) {
                 System.out.println("You have more than 1 card in your hand!");
 
                 //not working properly - user gets a card even if they call uno/after calling uno and trying to do -1
-            } else if ((!input.equals("uno") && playerHand.size() == 1) && ((!input.equals(-1) || !input.equals("help")))){
+            } else if (!input.equals("uno") && playerHand.size() == 1 && !input.equals("-1")) {
                 System.out.println("You forgot to say UNO - you get an extra card!");
                 game.submitDraw(currentPlayer);
-            } else if (input.equals("help")) {
-                Game.helpMenu();
-
-            } else if (input.equals("exit")) {
-                gameExit = true;
             } else {
                 try {
 
@@ -113,7 +156,8 @@ public class Main {
                         } catch (InvalidPlayerTurnException e) {
                             System.out.println("Invalid Player Turn: " + e.getMessage());
                         }
-                    } else {
+                    }else {
+
 
 //Submit a player card
                         UnoCard playerCard = playerHand.get(cardIndex);
@@ -154,9 +198,11 @@ public class Main {
 
 
 //Continue playing until someone has 0 cards!
-        }
 
+
+
+        }
         System.out.println("Game Over. Thank you for playing!");
     }
-
 }
+
