@@ -29,7 +29,7 @@ public class UnoCard {
     private Color color; //can't be final so we can change it @ bot color choices
     private final Value value;
 
-    protected int points;
+    protected int points; //points per card
 
     protected int numberHandCards;
 

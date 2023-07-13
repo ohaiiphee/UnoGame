@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,12 +32,13 @@ public class Game {
     private UnoCard.Value validValue;
 
     //hashMap to keep player IDs and points
-    private HashMap<String, Integer> playerPoints;
+    private HashMap<String, Integer> playersPoints = new HashMap<>();
 
 
-    public void setPlayerPoints(HashMap<String, Integer> playerPoints) {
-        this.playerPoints = playerPoints;
-    }
+    //array to keep player points --> point index position matches player index position
+
+    int[] playerPoints = new int[4];
+
 
     //to keep track of the game direction (clockwise/counter clockwise)
     boolean gameDirection;
@@ -73,7 +75,7 @@ public class Game {
         playersHands = new ArrayList<ArrayList<UnoCard>>();
         for (int i = 0; i < totalNumberPlayers; i++) {
             //array with how many cards a player starts with
-            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(3))); //change back to 7, FOR TESTING PURPOSES ONLY
+            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(2))); //change back to 7, FOR TESTING PURPOSES ONLY
             playersHands.add(hand); //keeps track of all players' hands
         }
     }
@@ -147,7 +149,7 @@ public class Game {
             index = playerIds.length + 4;
         }
         //get previous player reverse verlauf
-        if(gameDirection){
+        if (gameDirection) {
             index = this.currentPlayer + 1;
             if (index == 4) {
                 index = playerIds.length - 4; //goes back to index 0 (first player)
@@ -213,7 +215,7 @@ public class Game {
         }
 
         getPlayerHand(pid).add(deck.drawCard());
-        System.out.println("----- game direction: "+ gameDirection + " current player: "+ currentPlayer);
+
         if (gameDirection == false) {
             currentPlayer = (currentPlayer + 1) % playerIds.length;
         } else if (gameDirection == true) {
@@ -222,7 +224,7 @@ public class Game {
                 currentPlayer = 3;
             }
         }
-        System.out.println("----- game direction after switching: "+ gameDirection + " current player: "+ currentPlayer);
+
     }
 
     public void setCardColor(UnoCard.Color color) {
@@ -258,7 +260,7 @@ public class Game {
                 Scanner input = new Scanner(System.in);
                 challengeChoice = input.nextLine();
 
-                while(!challengeChoice.equalsIgnoreCase("no") && !challengeChoice.equalsIgnoreCase("yes")){
+                while (!challengeChoice.equalsIgnoreCase("no") && !challengeChoice.equalsIgnoreCase("yes")) {
                     System.out.println("please answer yes or no...");
                     challengeChoice = input.nextLine();
                 }
@@ -271,9 +273,9 @@ public class Game {
                     ArrayList<UnoCard> playerHand = getPlayerHand(pid);
 
                     for (UnoCard playerCard : playerHand) {
-                        //TODO: check why this always returns true
+
                         if (playerCard.getColor().equals(prevCardColor))
-                                //|| playerCard.getValue().equals(getTopCard().getValue())
+                        //|| playerCard.getValue().equals(getTopCard().getValue())
                         {
                             hasValidCardForPlus4Check = true;
                             break;
@@ -315,19 +317,22 @@ public class Game {
         if (hasEmptyHand(this.playerIds[currentPlayer])) {
             System.out.println(this.playerIds[currentPlayer] + " won this round!");
 
-            //TODO:check why this isn't working :(
 
-//            // Give the winning player points based on the other players' handcards
+            // Give the winning player points based on the other players' handcards
             int winningPlayerPoints = calculatePoints(this.playerIds[currentPlayer]);
-            playerPoints.put(this.playerIds[currentPlayer], winningPlayerPoints);
 
-//            // Print the points for each player
-            for (String player : playerIds) {
-                System.out.println("I am here");
-                System.out.println(player + " has " + playerPoints.get(player) + " points.");
+            System.out.println("Points after this round: ");
+
+            int winningPlayerIndex = currentPlayer;
+            playerPoints[winningPlayerIndex] += winningPlayerPoints;
+
+            for (int i = 0; i < playerIds.length; i++) {
+                System.out.println(playerIds[i] + " has " + playerPoints[i] + " points");
             }
 
-            System.exit(0);
+            isGameOver();
+
+
         }
 
         validColor = card.getColor();
@@ -335,8 +340,7 @@ public class Game {
         stockpile.add(card);
 
         //jumps to next player
-        System.out.println("--switching to next player: game direction: "+ gameDirection+
-                "player before switching: "+ currentPlayer);
+
         if (gameDirection == false) {
             currentPlayer = (currentPlayer + 1) % playerIds.length;
         } else if (gameDirection == true) {
@@ -345,7 +349,7 @@ public class Game {
                 currentPlayer = playerIds.length - 1;
             }
         }
-        System.out.println("--current player after switching: "+ currentPlayer);
+
 
         if (card.getColor() == UnoCard.Color.BLACK) {
             validColor = declaredColor;
@@ -360,7 +364,7 @@ public class Game {
 
         if (card.getValue() == UnoCard.Value.DrawFour) {
             //if during the +4 check the current player had another card they could play:
-            if(hasValidCardForPlus4Check){
+            if (hasValidCardForPlus4Check) {
                 pid = getPreviousPlayer(currentPlayer);
                 getPlayerHand(pid).add(deck.drawCard());
                 getPlayerHand(pid).add(deck.drawCard());
@@ -369,7 +373,7 @@ public class Game {
                 System.out.println(pid + " drew 4 cards.");
 
                 //if during the +4 check the current player didn't have another card that they could play:
-            } else if(challengeChoice.equalsIgnoreCase("yes") && !hasValidCardForPlus4Check){
+            } else if (challengeChoice.equalsIgnoreCase("yes") && !hasValidCardForPlus4Check) {
                 pid = playerIds[currentPlayer];
                 getPlayerHand(pid).add(deck.drawCard());
                 getPlayerHand(pid).add(deck.drawCard());

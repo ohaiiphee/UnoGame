@@ -10,6 +10,8 @@ public class Main {
         int totalNumberPlayers = 0;
         boolean validInput = false;
 
+        String unoInput = " ";
+
         while (!validInput) {
             System.out.print("Enter the number of human players: ");
             System.out.println(" ");
@@ -76,7 +78,6 @@ public class Main {
             }
             String input = null;
 
-//TODO: Prompt the bot for input
             if (currentPlayer.toLowerCase().contains("bot")) {
                 UnoCard playerCard2 = null;
                 System.out.println("I'm a bot and it's my turn :)");
@@ -162,11 +163,11 @@ public class Main {
                 gameExit = true;
             } else if (input.equals("uno") && playerHand.size() == 1) {
                 System.out.println("UNO!");
+                unoInput = "uno";
             } else if (input.equals("uno") && playerHand.size() != 1) {
                 System.out.println("You have more than 1 card in your hand!");
-
                 //not working properly - user gets a card even if they call uno/after calling uno and trying to do -1
-            } else if (!input.equals("uno") && playerHand.size() == 1 && !input.equals("-1")) {
+            } else if (!input.equals("uno") && playerHand.size() == 1 && !input.equals("-1") && !unoInput.equalsIgnoreCase("uno")) {
                 System.out.println("You forgot to say UNO - you get an extra card!");
                 game.submitDraw(currentPlayer);
             } else {
