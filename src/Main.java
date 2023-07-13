@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
     public static void main(String[] args) throws InvalidPlayerTurnException {
@@ -62,66 +63,90 @@ public class Main {
             ArrayList<UnoCard> playerHand = game.getPlayerHand(currentPlayer);
             topCard.setNumberHandCards(playerHand.size());
 
-
+            //we should only see the cards if the current player is a human --> commented for now for testing purposes
+            //       if (!currentPlayer.toLowerCase().contains("bot")) {
             System.out.println(currentPlayer + "'s cards: (" + topCard.getNumberHandCards() + ") " + playerHand);
+            //      }
 
             Scanner scanner = new Scanner(System.in);
-            System.out.println("Enter the index of the card you want to play (or -1 to draw a card): ");
+            //we don't need to ask bots which card they want to play, they can think for themselves ;)
+            if (!currentPlayer.toLowerCase().contains("bot")) {
+                System.out.println("Enter the index of the card you want to play (or -1 to draw a card): ");
+            }
             String input = null;
 
 //TODO: Prompt the bot for input
             if (currentPlayer.toLowerCase().contains("bot")) {
+                UnoCard playerCard2 = null;
                 System.out.println("I'm a bot and it's my turn :)");
                 for (int i = 0; i < playerHand.size(); i++) {
+
                     if (playerHand.size() == 1) {
                         input = "uno";
                     }
-                    for (int j = 0; j < playerHand.size(); j++) {
-                        if (playerHand.get(j).getColor().equals(game.getTopCard().getColor())) {
-                            input = String.valueOf(j);
 
-                        }
+                    playerCard2 = playerHand.get(i);
 
-
-                        UnoCard playerCard2 = playerHand.get(i);
-                        if (game.validCardPlay(playerCard2)) {
-                            try {
-                                game.submitPlayerCard(currentPlayer, playerCard2, UnoCard.Color.RED);
-                            } catch (InvalidColorSubmissionException e) {
-                                throw new RuntimeException(e);
-                            } catch (InvalidValueSubmissionException e) {
-                                throw new RuntimeException(e);
-                            }
-                            //if bot plays a wildColor, make it choose a color randomly
-                            if (playerCard2.getColor() == UnoCard.Color.BLACK) {
-                                System.out.println(currentPlayer + " is choosing a color...");
-                                int randomColor;
-                                while ((randomColor = (int) Math.random() * 10) < 5) ;
-
-                                switch (randomColor) {
-                                    case 1:
-                                        input = "Red";
-                                        break;
-                                    case 2:
-                                        input = "Blue";
-                                        break;
-                                    case 3:
-                                        input = "Green";
-                                        break;
-                                    case 4:
-                                        input = "Yellow";
-                                        break;
-                                }
-                            }
-                        } else {
-                            //if bot has no cards to play, it takes a card
-                            input = "-1";
-                            break;
-                        }
+                    //if the color of card[i] on bot's hand matches topCard's color, play that card
+                    //bot will play the first card in the that can be played
+                    //which means that if a wildCard is before another validCard, the bot will play it --> bots can also participate in the +4 Strafe!
+                    if (playerCard2.getColor().equals(game.getTopCard().getColor())) {
+                        input = String.valueOf(i);
+                        break;
                     }
+
+                    if (playerCard2.getValue().equals(game.getTopCard().getValue())) {
+                        input = String.valueOf(i);
+                        break;
+                    }
+
+                    //check if it's a valid play
+                    if(!game.validCardPlay(playerCard2)){
+
+                        //if bot plays a wildColor or +4, make it choose a color randomly
+                        if(playerCard2.getColor()== UnoCard.Color.BLACK){
+                            System.out.println(currentPlayer + " is choosing a color...");
+                            int randomColor = ThreadLocalRandom.current().nextInt(1,4+1);
+
+                            switch (randomColor) {
+                                case 1:
+                                    input = "Red";
+                                    break;
+                                case 2:
+                                    input = "Blue";
+                                    break;
+                                case 3:
+                                    input = "Green";
+                                    break;
+                                case 4:
+                                    input = "Yellow";
+                                    break;
+                            }
+                            //TODO: check how to do this
+                            input = String.valueOf(randomColor);
+                            input = String.valueOf(i);
+                        }
+                        //if bot has no cards to play, it takes a card
+                        input = "-1";
+                    }
+
+
+                    if (game.validCardPlay(playerCard2)) {
+                        try {
+                            game.submitPlayerCard(currentPlayer, playerCard2, UnoCard.Color.RED);
+                        } catch (InvalidColorSubmissionException e) {
+                            throw new RuntimeException(e);
+                        } catch (InvalidValueSubmissionException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }
+
                 }
+
+
             }
-            if (!currentPlayer.toLowerCase().contains("bot")) {
+           if (!currentPlayer.toLowerCase().contains("bot")) {
                 input = scanner.nextLine().toLowerCase();
             }
 
@@ -157,8 +182,7 @@ public class Main {
                         } catch (InvalidPlayerTurnException e) {
                             System.out.println("Invalid Player Turn: " + e.getMessage());
                         }
-                    }else {
-
+                    } else {
 
 //Submit a player card
                         UnoCard playerCard = playerHand.get(cardIndex);
@@ -199,7 +223,6 @@ public class Main {
 
 
 //Continue playing until someone has 0 cards!
-
 
 
         }

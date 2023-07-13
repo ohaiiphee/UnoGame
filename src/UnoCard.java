@@ -26,7 +26,7 @@ public class UnoCard {
     }
 
     //create our three variables
-    private final Color color;
+    private Color color; //can't be final so we can change it @ bot color choices
     private final Value value;
 
     protected int points;
@@ -42,6 +42,10 @@ public class UnoCard {
         return this.color;
     }
 
+    public void setColor(Color c) {
+        this.color = c;
+    }
+
     public int getNumberHandCards() {
         return this.numberHandCards;
     }
@@ -53,7 +57,6 @@ public class UnoCard {
     public Value getValue() {
         return this.value;
     }
-
 
 
     public int getPoints() {
@@ -87,11 +90,12 @@ public class UnoCard {
                 return 50;
             default:
                 break;
-        }return 0;
+        }
+        return 0;
     }
 
     @Override
     public String toString() {
-        return color + "_" + value + "(points:" + getPoints()+")";
+        return color + "_" + value + "(points:" + getPoints() + ")";
     }
 }

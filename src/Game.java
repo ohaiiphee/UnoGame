@@ -223,7 +223,7 @@ public class Game {
 
     public void submitPlayerCard(String pid, UnoCard card, UnoCard.Color declaredColor)
             throws InvalidColorSubmissionException, InvalidValueSubmissionException, InvalidPlayerTurnException {
-        checkPlayerTurn(pid);
+
         hasValidCardForPlus4Check = false; //resets everytime a card is played
         ArrayList<UnoCard> pHand = getPlayerHand(pid);
 
