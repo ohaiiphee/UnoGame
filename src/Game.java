@@ -68,7 +68,7 @@ public class Game {
         stockpile = new ArrayList<UnoCard>();
 
         currentPlayer = 0;
-        gameDirection = false; //standard game direction
+        gameDirection = true; //standard game direction = false
 
         playersHands = new ArrayList<ArrayList<UnoCard>>();
         for (int i = 0; i < totalNumberPlayers; i++) {
@@ -205,14 +205,16 @@ public class Game {
         }
 
         getPlayerHand(pid).add(deck.drawCard());
+        System.out.println("----- game direction: "+ gameDirection + " current player: "+ currentPlayer);
         if (gameDirection == false) {
             currentPlayer = (currentPlayer + 1) % playerIds.length;
         } else if (gameDirection == true) {
             currentPlayer = (currentPlayer - 1) % playerIds.length;
             if (currentPlayer == -1) {
-                currentPlayer = playerIds.length;
+                currentPlayer = 3;
             }
         }
+        System.out.println("----- game direction after switching: "+ gameDirection + " current player: "+ currentPlayer);
     }
 
     public void setCardColor(UnoCard.Color color) {
@@ -322,6 +324,9 @@ public class Game {
         validValue = card.getValue();
         stockpile.add(card);
 
+        //jumps to next player
+        System.out.println("--switching to next player: game direction: "+ gameDirection+
+                "player before switching: "+ currentPlayer);
         if (gameDirection == false) {
             currentPlayer = (currentPlayer + 1) % playerIds.length;
         } else if (gameDirection == true) {
@@ -330,6 +335,7 @@ public class Game {
                 currentPlayer = playerIds.length - 1;
             }
         }
+        System.out.println("--current player after switching: "+ currentPlayer);
 
         if (card.getColor() == UnoCard.Color.BLACK) {
             validColor = declaredColor;

@@ -68,6 +68,7 @@ public class Main {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the index of the card you want to play (or -1 to draw a card): ");
             String input = null;
+
 //TODO: Prompt the bot for input
             if (currentPlayer.toLowerCase().contains("bot")) {
                 System.out.println("I'm a bot and it's my turn :)");
