@@ -66,10 +66,8 @@ public class Main {
             ArrayList<UnoCard> playerHand = game.getPlayerHand(currentPlayer);
             topCard.setNumberHandCards(playerHand.size());
 
-            //we should only see the cards if the current player is a human --> commented for now for testing purposes
-            //       if (!currentPlayer.toLowerCase().contains("bot")) {
             System.out.println(currentPlayer + "'s cards: (" + topCard.getNumberHandCards() + ") " + playerHand);
-            //      }
+
 
             Scanner scanner = new Scanner(System.in);
             //we don't need to ask bots which card they want to play, they can think for themselves ;)
