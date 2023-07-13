@@ -49,6 +49,7 @@ public class Main {
 
         while (!gameOver) {
 //Get the top card
+            game.getPrevColor();
             UnoCard topCard = game.getTopCard();
             System.out.println(" ");
             System.out.println("Top Card: " + topCard);
@@ -124,7 +125,7 @@ public class Main {
                             }
                             //TODO: check how to do this
                             input = String.valueOf(randomColor);
-                            input = String.valueOf(i);
+
                         }
                         //if bot has no cards to play, it takes a card
                         input = "-1";
@@ -151,7 +152,6 @@ public class Main {
             }
 
 //Prompt the user for input
-
 
             int cardIndex;
 

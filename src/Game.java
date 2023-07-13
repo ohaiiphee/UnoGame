@@ -118,6 +118,14 @@ public class Game {
         return new UnoCard(validColor, validValue);
     }
 
+    UnoCard.Color prevCardColor;
+
+    void getPrevColor() {
+        if (!getTopCard().getColor().equals(UnoCard.Color.BLACK)) {
+            prevCardColor = getTopCard().getColor();
+
+        }
+    }
 
     public boolean isGameOver() {
         for (String player : this.playerIds) {
@@ -264,7 +272,9 @@ public class Game {
 
                     for (UnoCard playerCard : playerHand) {
                         //TODO: check why this always returns true
-                        if (playerCard.getColor().equals(getTopCard().getColor()) || playerCard.getValue().equals(getTopCard().getValue())) {
+                        if (playerCard.getColor().equals(prevCardColor))
+                                //|| playerCard.getValue().equals(getTopCard().getValue())
+                        {
                             hasValidCardForPlus4Check = true;
                             break;
                         }
