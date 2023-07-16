@@ -9,8 +9,10 @@ public class Main {
         int numberBotPlayers = 0;
         int totalNumberPlayers = 0;
         boolean validInput = false;
-
+        String botColor = null;
+        Database.createDatabase();
         String unoInput = " ";
+
 
         while (!validInput) {
             System.out.print("Enter the number of human players: ");
@@ -81,8 +83,9 @@ public class Main {
                 System.out.println("I'm a bot and it's my turn :)");
                 for (int i = 0; i < playerHand.size(); i++) {
 
-                    if (playerHand.size() == 1) {
+                    if (playerHand.size() == 1 && !unoInput.equalsIgnoreCase("uno")) {
                         input = "uno";
+                        break;
                     }
 
                     playerCard2 = playerHand.get(i);
@@ -101,35 +104,38 @@ public class Main {
                     }
 
                     //check if it's a valid play
-                    if(!game.validCardPlay(playerCard2)){
+                    if (playerCard2.getColor().equals(UnoCard.Color.BLACK)) {
+                        input = String.valueOf(i);
 
                         //if bot plays a wildColor or +4, make it choose a color randomly
-                        if(playerCard2.getColor()== UnoCard.Color.BLACK){
-                            System.out.println(currentPlayer + " is choosing a color...");
-                            int randomColor = ThreadLocalRandom.current().nextInt(1,4+1);
+                        if (playerCard2.getColor() == UnoCard.Color.BLACK) {
+                            System.out.println(currentPlayer + " is playing a wild card...");
+                            int randomColor = ThreadLocalRandom.current().nextInt(1, 4 + 1);
 
                             switch (randomColor) {
                                 case 1:
-                                    input = "Red";
+                                    botColor = "red";
                                     break;
                                 case 2:
-                                    input = "Blue";
+                                    botColor = "blue";
                                     break;
                                 case 3:
-                                    input = "Green";
+                                    botColor = "green";
                                     break;
                                 case 4:
-                                    input = "Yellow";
+                                    botColor = "yellow";
                                     break;
                             }
-                            //TODO: check how to do this
-                            input = String.valueOf(randomColor);
+
+                            game.setChoice(botColor);
+                            break;
 
                         }
+                    }
+                    if (!game.validCardPlay(playerCard2)) {
                         //if bot has no cards to play, it takes a card
                         input = "-1";
                     }
-
 
                     if (game.validCardPlay(playerCard2)) {
                         try {
@@ -146,7 +152,7 @@ public class Main {
 
 
             }
-           if (!currentPlayer.toLowerCase().contains("bot")) {
+            if (!currentPlayer.toLowerCase().contains("bot")) {
                 input = scanner.nextLine().toLowerCase();
             }
 
@@ -155,7 +161,7 @@ public class Main {
             int cardIndex;
 
             if (input.equals("help")) {
-                Game.helpMenu();
+                game.helpMenu();
 
             } else if (input.equals("exit")) {
                 gameExit = true;
@@ -204,28 +210,34 @@ public class Main {
                 } catch (Exception e) {
                     System.out.println("If you don't know how to play try tipping 'help'");
                 }
+                unoInput = "null";
 
             }
 
 //Check if the game is over
-            if (gameExit || game.isGameOver()) {
-                System.out.println("Next Round? Type Yes");
-                Scanner playerinput = new Scanner(System.in);
-                String input2 = playerinput.nextLine().toLowerCase();
-                if (input2.equals("yes")) {
-                    game.start(game);
-                    System.out.println("New Round start:");
-                } else {
-                    gameOver = true;
-                }
+            if (game.checkIfPlayerHas500Points()) { //if a player has reached 500 points
+                gameOver = true;
+                break;
             }
+                if (gameExit || game.isGameOver()) {
+                    System.out.println("Next Round? Type Yes");
+                    Scanner playerinput = new Scanner(System.in);
+                    String input2 = playerinput.nextLine().toLowerCase();
+
+                    if (input2.equalsIgnoreCase("yes")) {
+                        game.start(game);
+                        System.out.println("New Round start:");
+                    } else {
+                        gameOver = true;
+                    }
+                }
 
 
 //Continue playing until someone has 0 cards!
 
 
+            }
+            System.out.println("Game Over. Thank you for playing!");
         }
-        System.out.println("Game Over. Thank you for playing!");
     }
-}
 

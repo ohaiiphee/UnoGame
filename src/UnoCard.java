@@ -25,8 +25,8 @@ public class UnoCard {
         }
     }
 
-    //create our three variables
-    private Color color; //can't be final so we can change it @ bot color choices
+    //create our variables
+    private final Color color;
     private final Value value;
 
     protected int points; //points per card
@@ -42,9 +42,6 @@ public class UnoCard {
         return this.color;
     }
 
-    public void setColor(Color c) {
-        this.color = c;
-    }
 
     public int getNumberHandCards() {
         return this.numberHandCards;

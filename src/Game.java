@@ -1,16 +1,18 @@
+
+import javax.xml.crypto.Data;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Game {
     private int currentPlayer;
 
-    boolean hasValidCardForPlus4Check = false; //for the +4 challenge check
-    private int currentPlayerPoints; //for later rounds --> you can always see how many points the current player has
+    int winningPlayerPoints;
 
-    private int pointsThisRound;
+    boolean hasValidCardForPlus4Check = false; //for the +4 challenge check
 
     int totalNumberPlayers;
 
@@ -30,9 +32,6 @@ public class Game {
 
     private UnoCard.Color validColor;
     private UnoCard.Value validValue;
-
-    //hashMap to keep player IDs and points
-    private HashMap<String, Integer> playersPoints = new HashMap<>();
 
 
     //array to keep player points --> point index position matches player index position
@@ -59,6 +58,13 @@ public class Game {
 
     }
 
+    String myChoice;
+
+
+    public void setChoice(String myChoice) {
+        this.myChoice = myChoice;
+    }
+
     public void startVorbereitung(int totalNumberPlayers) {
         if (totalNumberPlayers < 2 || totalNumberPlayers > 5) {
             throw new IllegalArgumentException("Number of players must be between 2 and 4.");
@@ -70,12 +76,12 @@ public class Game {
         stockpile = new ArrayList<UnoCard>();
 
         currentPlayer = 0;
-        gameDirection = true; //standard game direction = false
+        gameDirection = false; //standard game direction = false
 
         playersHands = new ArrayList<ArrayList<UnoCard>>();
         for (int i = 0; i < totalNumberPlayers; i++) {
             //array with how many cards a player starts with
-            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(2))); //change back to 7, FOR TESTING PURPOSES ONLY
+            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(3))); //change back to 7, FOR TESTING PURPOSES ONLY
             playersHands.add(hand); //keeps track of all players' hands
         }
     }
@@ -132,6 +138,10 @@ public class Game {
     public boolean isGameOver() {
         for (String player : this.playerIds) {
             if (hasEmptyHand(player)) {
+                //if a player has an empty hand, a new row gets added to the database
+                int sessionNumber = Database.generateSessionNumber();
+                int roundNumber = Database.sessionRoundMap.get(sessionNumber);
+                Database.addRowtoDatabase(player, sessionNumber, roundNumber, winningPlayerPoints );
                 return true;
             }
         }
@@ -143,12 +153,12 @@ public class Game {
     }
 
     public String getPreviousPlayer(int i) {
-        //get previous player normal verlauf
+        //get previous player clockwise
         int index = this.currentPlayer - 1;
         if (index == -1) {
-            index = playerIds.length + 4;
+            index = index + 4; //goes back to index 3 (last player)
         }
-        //get previous player reverse verlauf
+        //get previous player counterclockwise
         if (gameDirection) {
             index = this.currentPlayer + 1;
             if (index == 4) {
@@ -159,16 +169,16 @@ public class Game {
     }
 
     public String getNextPlayer(int i) {
-        //get next player normal verlauf
+        //get next player clockwise
         int index = this.currentPlayer + 1;
         if (index == 4) {
             index = playerIds.length - 4; //goes back to index 0 (first player)
         }
-        //get next player reverse verlauf
+        //get next player counterclockwise
         if (gameDirection) {
             index = this.currentPlayer - 1;
             if (index == -1) {
-                index = playerIds.length + 4;
+                index = index + 4; //goes back to index 3 (last player)
             }
         }
         return this.playerIds[index];
@@ -227,10 +237,6 @@ public class Game {
 
     }
 
-    public void setCardColor(UnoCard.Color color) {
-        validColor = color;
-    }
-
     public void submitPlayerCard(String pid, UnoCard card, UnoCard.Color declaredColor)
             throws InvalidColorSubmissionException, InvalidValueSubmissionException, InvalidPlayerTurnException {
 
@@ -257,9 +263,23 @@ public class Game {
             if (card.getValue() == UnoCard.Value.DrawFour) {
                 System.out.println(pid + " wants to play a +4!");
                 System.out.println(getNextPlayer(currentPlayer) + ", would you like to challenge the +4?");
-                Scanner input = new Scanner(System.in);
-                challengeChoice = input.nextLine();
 
+                Scanner input = new Scanner(System.in);
+
+                String nextPlayer = getNextPlayer(currentPlayer);
+                if (nextPlayer.contains("Bot")) {
+                    int randomBotChoice = ThreadLocalRandom.current().nextInt(1, 2 + 1);
+                    switch (randomBotChoice) {
+                        case 1:
+                            challengeChoice = "yes";
+                            break;
+                        case 2:
+                            challengeChoice = "no";
+                            break;
+                    }
+                } else {
+                    challengeChoice = input.nextLine();
+                }
                 while (!challengeChoice.equalsIgnoreCase("no") && !challengeChoice.equalsIgnoreCase("yes")) {
                     System.out.println("please answer yes or no...");
                     challengeChoice = input.nextLine();
@@ -283,29 +303,40 @@ public class Game {
                     }
                     if (hasValidCardForPlus4Check) {
                         System.out.println("Good choice, " + getNextPlayer(currentPlayer) + "! " + pid + " did have another card they could have played - they get the 4 cards.");
+
                     } else {
                         System.out.println("Bad choice, " + getNextPlayer(currentPlayer) + "... " + pid + "'s move was legit. You get 6 cards!");
-                        //Add stuff to make 6 cards go to next player and move on
+
                     }
                 }
             }
 
-            System.out.println("Choose the color (Red, Blue, Green, Yellow) that the next player must play:");
-            Scanner scanner = new Scanner(System.in);
-            String choice = scanner.nextLine();
+            String colorChoice;
 
 
+            if (!playerIds[currentPlayer].contains("Bot_")) {
+                System.out.println("Choose the color (Red, Blue, Green, Yellow) that the next player must play:");
+
+
+                Scanner colorInput = new Scanner(System.in);
+                colorChoice = colorInput.nextLine();
+                myChoice = colorChoice;
+
+            } else {
+                colorChoice = myChoice;
+            }
             boolean validChoice = false;
             UnoCard.Color chosenColor = null;
             while (!validChoice) {
-                if (choice.equalsIgnoreCase("Red") || choice.equalsIgnoreCase("Blue") ||
-                        choice.equalsIgnoreCase("Green") || choice.equalsIgnoreCase("Yellow")) {
-                    chosenColor = UnoCard.Color.valueOf(choice.toUpperCase());
+                if (colorChoice.equalsIgnoreCase("Red") || colorChoice.equalsIgnoreCase("Blue") ||
+                        colorChoice.equalsIgnoreCase("Green") || colorChoice.equalsIgnoreCase("Yellow")) {
+                    chosenColor = UnoCard.Color.valueOf(colorChoice.toUpperCase());
                     declaredColor = chosenColor;
                     validChoice = true;
+                    myChoice = null;
                 } else {
                     System.out.println("Invalid choice - please choose a valid color.");
-                    choice = scanner.nextLine();
+                    break;
                 }
 
 
@@ -316,19 +347,19 @@ public class Game {
 
         if (hasEmptyHand(this.playerIds[currentPlayer])) {
             System.out.println(this.playerIds[currentPlayer] + " won this round!");
+            System.out.println(" ");
 
 
             // Give the winning player points based on the other players' handcards
-            int winningPlayerPoints = calculatePoints(this.playerIds[currentPlayer]);
+            winningPlayerPoints = calculatePoints(this.playerIds[currentPlayer]);
 
             System.out.println("Points after this round: ");
+            System.out.println(" ");
 
             int winningPlayerIndex = currentPlayer;
             playerPoints[winningPlayerIndex] += winningPlayerPoints;
 
-            for (int i = 0; i < playerIds.length; i++) {
-                System.out.println(playerIds[i] + " has " + playerPoints[i] + " points");
-            }
+            displayPoints();
 
             isGameOver();
 
@@ -426,12 +457,29 @@ public class Game {
         }
     }
 
-    public static void helpMenu() {
+    public boolean checkIfPlayerHas500Points() {
+        for (int i = 0; i < playerIds.length; i++) {
+            if (playerPoints[i] >= 500) { //change to 500!
+                System.out.println(playerIds[i] + " has won the game!");
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public void displayPoints() {
+        for (int i = 0; i < playerIds.length; i++) {
+            System.out.println(playerIds[i] + " has " + playerPoints[i] + " points");
+        }
+    }
+
+    public void helpMenu() {
         Scanner scan = new Scanner(System.in);
         System.out.println(" ");
         System.out.println("This is the help menu how can I help you?");
         System.out.println("Here are all keywords:");
-        System.out.println("Play Card, Take Card, +2, +4, Wildcard, Objection, Reverse, skip, Win, Points, UNO, End Game");
+        System.out.println("Play Card, Take Card, +2, +4, Wildcard, Objection, Reverse, skip, Win, Points, Score, UNO, End Game");
         System.out.println("Enter 'Score' to see the current score");
         System.out.println("If you want to close the help menu enter keyword 'Close'");
         System.out.println(" ");
@@ -493,6 +541,7 @@ public class Game {
                 break;
             case "score":
                 System.out.println("Current points for each player: ");
+                displayPoints();
                 helpMenu();
                 break;
             case "uno":
