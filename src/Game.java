@@ -1,9 +1,6 @@
 
-import javax.xml.crypto.Data;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -42,6 +39,8 @@ public class Game {
     //to keep track of the game direction (clockwise/counter clockwise)
     boolean gameDirection;
 
+    boolean exitGame = false;
+
     public Game(int totalNumberPlayers, int numberHumanPlayers) {
         this.totalNumberPlayers = totalNumberPlayers;
 
@@ -69,7 +68,7 @@ public class Game {
         if (totalNumberPlayers < 2 || totalNumberPlayers > 5) {
             throw new IllegalArgumentException("Number of players must be between 2 and 4.");
         }
-
+        exitGame= false;
         deck = new UnoDeck();
         deck.reset();
         deck.shuffle();
@@ -133,6 +132,10 @@ public class Game {
             prevCardColor = getTopCard().getColor();
 
         }
+    }
+
+    public boolean getExitGame(){
+        return exitGame;
     }
 
     public boolean isGameOver() {
@@ -358,10 +361,37 @@ public class Game {
 
             int winningPlayerIndex = currentPlayer;
             playerPoints[winningPlayerIndex] += winningPlayerPoints;
+            System.out.println(" ");
 
             displayPoints();
+            System.out.println(" ");
 
-            isGameOver();
+            if(isGameOver()){
+                exitGame = true;
+            }
+
+
+            //            if (gameExit || game.isGameOver()) {
+//                if (game.checkIfPlayerHas500Points()) { //if a player has reached 500 points
+//                    gameOver = true;
+//                    break;
+//                }
+//                    System.out.println("Next Round? Type Yes");
+//                    Scanner playerinput = new Scanner(System.in);
+//                    String input2 = playerinput.nextLine().toLowerCase();
+//
+//                    if (input2.equalsIgnoreCase("yes")) {
+//                        game.start(game);
+//                        System.out.println("New Round start:");
+//                    } else {
+//                        gameOver = true;
+//                    }
+//                }
+//
+//
+////Continue playing until someone has 0 cards!
+//
+//
 
 
         }

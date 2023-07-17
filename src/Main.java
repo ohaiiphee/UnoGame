@@ -125,6 +125,8 @@ public class Main {
                                 case 4:
                                     botColor = "yellow";
                                     break;
+                                default:
+                                    botColor = null;
                             }
 
                             game.setChoice(botColor);
@@ -215,11 +217,12 @@ public class Main {
             }
 
 //Check if the game is over
-            if (game.checkIfPlayerHas500Points()) { //if a player has reached 500 points
-                gameOver = true;
-                break;
-            }
-                if (gameExit || game.isGameOver()) {
+
+            if (gameExit || game.exitGame) {
+                if (game.checkIfPlayerHas500Points()) { //if a player has reached 500 points
+                    gameOver = true;
+                    break;
+                }
                     System.out.println("Next Round? Type Yes");
                     Scanner playerinput = new Scanner(System.in);
                     String input2 = playerinput.nextLine().toLowerCase();
@@ -233,10 +236,10 @@ public class Main {
                 }
 
 
-//Continue playing until someone has 0 cards!
-
-
-            }
+////Continue playing until someone has 0 cards!
+//
+//
+           }
             System.out.println("Game Over. Thank you for playing!");
         }
     }
