@@ -98,7 +98,7 @@ public class Main {
                         break;
                     }
 
-                    if (playerCard2.getValue().equals(game.getTopCard().getValue())) {
+                    if ((playerCard2.getValue().equals(game.getTopCard().getValue())&& (playerCard2.getColor().equals("Black") == false))) {
                         input = String.valueOf(i);
                         break;
                     }
@@ -162,18 +162,18 @@ public class Main {
 
             int cardIndex;
 
-            if (input.equals("help")) {
+            if (input != null && input.equals("help")) {
                 game.helpMenu();
 
-            } else if (input.equals("exit")) {
+            } else if ((input != null) && (input.equals("exit"))) {
                 gameExit = true;
-            } else if (input.equals("uno") && playerHand.size() == 1) {
+            } else if ((input != null) && (input.equals("uno")) && (playerHand.size() == 1)) {
                 System.out.println("UNO!");
                 unoInput = "uno";
-            } else if (input.equals("uno") && playerHand.size() != 1) {
+            } else if ((input != null) && (input.equals("uno")) && (playerHand.size() != 1)) {
                 System.out.println("You have more than 1 card in your hand!");
                 //not working properly - user gets a card even if they call uno/after calling uno and trying to do -1
-            } else if (!input.equals("uno") && playerHand.size() == 1 && !input.equals("-1") && !unoInput.equalsIgnoreCase("uno")) {
+            } else if ((input != null) && !(input.equals("uno")) && (playerHand.size() == 1) && !(input.equals("-1")) && !(unoInput.equalsIgnoreCase("uno"))) {
                 System.out.println("You forgot to say UNO - you get an extra card!");
                 game.submitDraw(currentPlayer);
             } else {
@@ -235,10 +235,8 @@ public class Main {
                     }
                 }
 
-
 ////Continue playing until someone has 0 cards!
-//
-//
+
            }
             System.out.println("Game Over. Thank you for playing!");
         }

@@ -143,7 +143,8 @@ public class Game {
             if (hasEmptyHand(player)) {
                 //if a player has an empty hand, a new row gets added to the database
                 int sessionNumber = Database.generateSessionNumber();
-                int roundNumber = Database.sessionRoundMap.get(sessionNumber);
+                int roundNumber = 0;
+                roundNumber= Database.sessionRoundMap.get(roundNumber);
                 Database.addRowtoDatabase(player, sessionNumber, roundNumber, winningPlayerPoints );
                 return true;
             }
