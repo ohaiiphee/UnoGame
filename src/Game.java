@@ -11,13 +11,11 @@ public class Game {
 
     int winningPlayerIndex; //for calculating points
 
-    int winningPlayerPoints;
-
     boolean hasValidCardForPlus4Check = false; //for the +4 challenge check
 
     int totalNumberPlayers;
 
-    String challengeChoice;
+    String challengeChoice; //also for the +4 challenge check
 
     int roundNumber = 1; //for the datenbank system
 
@@ -27,7 +25,7 @@ public class Game {
     //deck that the players are playing with
     private UnoDeck deck;
 
-    //every player's hand is an array of uno cards -- to keep track of every players' hand, we make an array list of an array list --> playerHand is actually ALL of the players' hands
+    //every player's hand is an array of uno cards -- to keep track of every players' hand, we make an array list of an array list --> playersHands is ALL of the players' hands
     private ArrayList<ArrayList<UnoCard>> playersHands;
 
     //stockpile of cards we put down
@@ -37,7 +35,7 @@ public class Game {
     private UnoCard.Value validValue;
 
 
-    //array to keep player points --> point index position matches player index position
+    //array to keep player points --> playerPoints[i] position matches playerIDs[i] position
 
     int[] playerPoints = new int[4];
 
@@ -47,6 +45,7 @@ public class Game {
 
     boolean exitGame = false;
 
+    // Method to start the game - setting the number of human players as well as bots + their IDs
     public Game(int totalNumberPlayers, int numberHumanPlayers) {
         this.totalNumberPlayers = totalNumberPlayers;
 
@@ -70,10 +69,10 @@ public class Game {
         this.myChoice = myChoice;
     }
 
+    //Here we set the rules to start a game
+    //we also create a new Uno Deck, shuffle it and create a stockpile for all the cards that got played.
     public void startVorbereitung(int totalNumberPlayers) {
-        if (totalNumberPlayers < 2 || totalNumberPlayers > 5) {
-            throw new IllegalArgumentException("Number of players must be between 2 and 4.");
-        }
+
         exitGame = false;
         deck = new UnoDeck();
         deck.reset();
@@ -83,14 +82,17 @@ public class Game {
         currentPlayer = 0;
         gameDirection = false; //standard game direction = false
 
+//Here we create an ArrayList for each players' hand
+
         playersHands = new ArrayList<ArrayList<UnoCard>>();
         for (int i = 0; i < totalNumberPlayers; i++) {
             //array with how many cards a player starts with
-            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(3))); //change back to 7, FOR TESTING PURPOSES ONLY
+            ArrayList<UnoCard> hand = new ArrayList<UnoCard>(Arrays.asList(deck.drawCard(7))); //FOR TESTING PURPOSES ONLY change how many cards players start with --> change back to 7!
             playersHands.add(hand); //keeps track of all players' hands
         }
     }
 
+    //In this method we start the game
     public void start(Game game) {
         //first thing we do in the game --> get a card from the deck
         startVorbereitung(totalNumberPlayers);
@@ -117,6 +119,7 @@ public class Game {
             }
         }
 
+        //If the first card happens to be a reverse, the game direction gets changed
         if (card.getValue() == UnoCard.Value.Reverse) {
             System.out.println("The game direction has changed!");
 
@@ -133,6 +136,7 @@ public class Game {
 
     UnoCard.Color prevCardColor;
 
+    //This method saves the previous color of the TopCard- if said card is not a black card
     void getPrevColor() {
         if (!getTopCard().getColor().equals(UnoCard.Color.BLACK)) {
             prevCardColor = getTopCard().getColor();
@@ -140,13 +144,11 @@ public class Game {
         }
     }
 
-    public boolean getExitGame() {
-        return exitGame;
-    }
-
+    //A method for ending the game
     public boolean isGameOver() {
         for (String player : this.playerIds) {
             if (hasEmptyHand(player)) {
+
                 //if a player has an empty hand, a new row gets added to the database
                 int sessionNumber = Database.generateSessionNumber();
 
@@ -162,6 +164,7 @@ public class Game {
         return this.playerIds[this.currentPlayer];
     }
 
+    //Here we get the previous player- needed for e.g. skip, or reverse cards
     public String getPreviousPlayer(int i) {
         //get previous player clockwise
         int index = this.currentPlayer - 1;
@@ -178,6 +181,7 @@ public class Game {
         return this.playerIds[index];
     }
 
+    //This method gets the next player in the games direction - needed for skip or reverse.
     public String getNextPlayer(int i) {
         //get next player clockwise
         int index = this.currentPlayer + 1;
@@ -194,23 +198,13 @@ public class Game {
         return this.playerIds[index];
     }
 
-    public String[] getPlayers() {
-        return playerIds;
-    }
 
+    //This method shows the amount of cards a player has in their hand currently
     public ArrayList<UnoCard> getPlayerHand(String pid) {
         int index = Arrays.asList(playerIds).indexOf(pid);
         return playersHands.get(index);
     }
 
-    public int getPlayerHandSize(String pid) {
-        return getPlayerHand(pid).size();
-    }
-
-    public UnoCard getPlayerCard(String pid, int choice) {
-        ArrayList<UnoCard> hand = getPlayerHand(pid);
-        return hand.get(choice);
-    }
 
     public boolean hasEmptyHand(String pid) {
         return getPlayerHand(pid).isEmpty();
@@ -220,12 +214,14 @@ public class Game {
         return card.getColor() == validColor || card.getValue() == validValue;
     }
 
+    //This method ensures that every player only plays when it's their turn
     public void checkPlayerTurn(String pid) throws InvalidPlayerTurnException {
         if (this.playerIds[this.currentPlayer] != pid) {
             throw new InvalidPlayerTurnException("It is not " + pid + "'s turn", pid);
         }
     }
 
+    //This method gives the player a card when the player inputs -1
     public void submitDraw(String pid) throws InvalidPlayerTurnException {
         checkPlayerTurn(pid);
 
@@ -247,6 +243,8 @@ public class Game {
 
     }
 
+    //This method ensures that the card being played is valid, and then plays the chosen card
+    //If it is not, the player gets an extra card as penalty.
     public void submitPlayerCard(String pid, UnoCard card, UnoCard.Color declaredColor)
             throws InvalidColorSubmissionException, InvalidValueSubmissionException, InvalidPlayerTurnException {
 
@@ -276,6 +274,7 @@ public class Game {
 
                 Scanner input = new Scanner(System.in);
 
+//If the next player is a bot, the answer gets randomized
                 String nextPlayer = getNextPlayer(currentPlayer);
                 if (nextPlayer.contains("Bot")) {
                     int randomBotChoice = ThreadLocalRandom.current().nextInt(1, 2 + 1);
@@ -290,6 +289,7 @@ public class Game {
                 } else {
                     challengeChoice = input.nextLine();
                 }
+//If a player tries to type in anything besides "yes" or "no" they get asked to give a valid answer
                 while (!challengeChoice.equalsIgnoreCase("no") && !challengeChoice.equalsIgnoreCase("yes")) {
                     System.out.println("please answer yes or no...");
                     challengeChoice = input.nextLine();
@@ -299,13 +299,13 @@ public class Game {
                 } else if (challengeChoice.equalsIgnoreCase("yes")) {
                     System.out.println("We have a challenge!");
 
+//If a player is challenged the program goes through their handcards and checks if there are any cards matching the color, or value of the top card.
                     pid = playerIds[currentPlayer];
                     ArrayList<UnoCard> playerHand = getPlayerHand(pid);
 
                     for (UnoCard playerCard : playerHand) {
 
                         if (playerCard.getColor().equals(prevCardColor))
-                        //|| playerCard.getValue().equals(getTopCard().getValue())
                         {
                             hasValidCardForPlus4Check = true;
                             break;
@@ -323,7 +323,7 @@ public class Game {
 
             String colorChoice;
 
-
+//The bots can also decide which color counts as valid next.
             if (!playerIds[currentPlayer].contains("Bot_")) {
                 System.out.println("Choose the color (Red, Blue, Green, Yellow) that the next player must play:");
 
@@ -343,7 +343,7 @@ public class Game {
                     chosenColor = UnoCard.Color.valueOf(colorChoice.toUpperCase());
                     declaredColor = chosenColor;
                     validChoice = true;
-                    myChoice = null;
+                    // myChoice = null;
                 } else {
                     System.out.println("Invalid choice - please choose a valid color.");
                     break;
@@ -355,6 +355,7 @@ public class Game {
 
         pHand.remove(card);
 
+//This prints the winning players ID + standard winning text if they have no cards left in their hand
         if (hasEmptyHand(this.playerIds[currentPlayer])) {
             System.out.println(" ");
             System.out.println(this.playerIds[currentPlayer] + " won this round!");
@@ -394,10 +395,12 @@ public class Game {
             }
         }
 
+//This ensures that the players chosen color is the next valid color when a black card comes into play
 
         if (card.getColor() == UnoCard.Color.BLACK) {
             validColor = declaredColor;
         }
+//When a +2 card gets played the next player has the next 2 cards added to their hand
 
         if (card.getValue() == UnoCard.Value.DrawTwo) {
             pid = playerIds[currentPlayer];
@@ -437,7 +440,7 @@ public class Game {
                 System.out.println(pid + " drew 4 cards.");
             }
         }
-
+//Here we skip the next player when a skip card comes into play
         if (card.getValue() == UnoCard.Value.Skip) {
             System.out.println(playerIds[currentPlayer] + " was skipped!");
 
@@ -451,6 +454,7 @@ public class Game {
             }
         }
 
+//Here we change the games direction by reassigning the player IDs according to the games direction
         if (card.getValue() == UnoCard.Value.Reverse) {
             System.out.println(pid + " changed the game direction.");
 
@@ -470,9 +474,10 @@ public class Game {
         }
     }
 
+    //this method checks if one of the players has reached 500 points and therefore won the game
     public boolean checkIfPlayerHas500Points() {
         for (int i = 0; i < playerIds.length; i++) {
-            if (playerPoints[i] >= 500) { //change to 500!
+            if (playerPoints[i] >= 500) { //FOR TESTING PURPOSES lower points to test endgame faster --> change to 500!
                 System.out.println(playerIds[i] + " has won the game!");
                 return true;
             }
@@ -481,17 +486,20 @@ public class Game {
     }
 
 
+    //Method to show points on the console
     public void displayPoints() {
         for (int i = 0; i < playerIds.length; i++) {
             System.out.println(playerIds[i] + " has " + playerPoints[i] + " points");
         }
     }
 
+    //Method to show winner on the console
     public int getWinner() {
         return playerPoints[winningPlayerIndex];
 
     }
 
+    //Our help menu - based on what the player types in they receive a fitting response
     public void helpMenu() {
         Scanner scan = new Scanner(System.in);
         System.out.println(" ");
@@ -577,6 +585,7 @@ public class Game {
     }
 
 
+    //Here we calculate the points of the winning player by summing up the values of the other players handcards
     private int calculatePoints(String pid) {
         int points = 0;
         for (String player : playerIds) {

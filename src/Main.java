@@ -4,6 +4,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
     public static void main(String[] args) throws InvalidPlayerTurnException {
+// First we define what we need and assign a value so that we can change it later
+
+        //test
 
         int numberHumanPlayers = 0;
         int numberBotPlayers = 0;
@@ -13,6 +16,7 @@ public class Main {
         Database.createDatabase();
         String unoInput = " ";
 
+//Here the players put in the amount of human players. The input has to be between 1 and 4 to be valid
 
         while (!validInput) {
             System.out.print("Enter the number of human players: ");
@@ -25,6 +29,8 @@ public class Main {
             } else {
                 System.out.println("The number of human players must be between 1 and 4. Please enter a number again.");
             }
+
+// Here the rest of valid players get substituted by bots until the total amount of players equals 4.
 
             if (numberHumanPlayers < 4) {
                 if (numberHumanPlayers == 1) {
@@ -52,6 +58,7 @@ public class Main {
         boolean gameExit = false;
 
         while (!gameOver) {
+
 //Get the top card
             game.getPrevColor();
             UnoCard topCard = game.getTopCard();
@@ -78,6 +85,7 @@ public class Main {
             }
             String input = null;
 
+// here the Bots take their turns
             if (currentPlayer.toLowerCase().contains("bot")) {
                 UnoCard playerCard2 = null;
                 System.out.println("I'm a bot and it's my turn :)");
@@ -91,7 +99,7 @@ public class Main {
                     playerCard2 = playerHand.get(i);
 
                     //if the color of card[i] on bot's hand matches topCard's color, play that card
-                    //bot will play the first card in the that can be played
+                    //bot will play the first card in the hand that can be played
                     //which means that if a wildCard is before another validCard, the bot will play it --> bots can also participate in the +4 Strafe!
                     if (playerCard2.getColor().equals(game.getTopCard().getColor())) {
                         input = String.valueOf(i);
@@ -104,7 +112,7 @@ public class Main {
                     }
 
                     //check if it's a valid play
-                    if (playerCard2.getColor().equals(UnoCard.Color.BLACK)) {
+                    if (playerCard2.getColor().equals(UnoCard.Color.BLACK) && !(topCard.getValue().equals(UnoCard.Value.DrawFour))) {
                         input = String.valueOf(i);
 
                         //if bot plays a wildColor or +4, make it choose a color randomly
@@ -158,7 +166,7 @@ public class Main {
                 input = scanner.nextLine().toLowerCase();
             }
 
-//Prompt the user for input
+//Prompt the user for input. They can either choose the index of the card they want to play, open the help menu, say "UNO" or draw a card by typing -1
 
             int cardIndex;
 
@@ -172,7 +180,7 @@ public class Main {
                 unoInput = "uno";
             } else if ((input != null) && (input.equals("uno")) && (playerHand.size() != 1)) {
                 System.out.println("You have more than 1 card in your hand!");
-                //not working properly - user gets a card even if they call uno/after calling uno and trying to do -1
+
             } else if ((input != null) && !(input.equals("uno")) && (playerHand.size() == 1) && !(input.equals("-1")) && !(unoInput.equalsIgnoreCase("uno"))) {
                 System.out.println("You forgot to say UNO - you get an extra card!");
                 game.submitDraw(currentPlayer);
@@ -183,7 +191,8 @@ public class Main {
 
 
                     if (cardIndex == -1) {
-//Draw a card
+
+//Draw a card by typing in -1
                         try {
                             game.submitDraw(currentPlayer);
                         } catch (InvalidPlayerTurnException e) {
@@ -192,6 +201,8 @@ public class Main {
                     } else {
 
 //Submit a player card
+// If a player tries to play an invalid card they get an extra card added to their hand as a penalty
+
                         UnoCard playerCard = playerHand.get(cardIndex);
                         try {
                             game.submitPlayerCard(currentPlayer, playerCard, UnoCard.Color.RED);
@@ -223,22 +234,23 @@ public class Main {
                     gameOver = true;
                     break;
                 }
-                    System.out.println("Next Round? Type Yes");
-                    Scanner playerinput = new Scanner(System.in);
-                    String input2 = playerinput.nextLine().toLowerCase();
 
-                    if (input2.equalsIgnoreCase("yes")) {
-                        game.start(game);
-                        System.out.println("New Round start:");
-                    } else {
-                        gameOver = true;
-                    }
+// After a round the player(s) can decide whether or not they want to play another round by typing "yes".
+// If they type in anything else the game ends.
+                System.out.println("Next Round? Type Yes");
+                Scanner playerinput = new Scanner(System.in);
+                String input2 = playerinput.nextLine().toLowerCase();
+
+                if (input2.equalsIgnoreCase("yes")) {
+                    game.start(game);
+                    System.out.println("New Round start:");
+                } else {
+                    gameOver = true;
                 }
+            }
 
-////Continue playing until someone has 0 cards!
-
-           }
-            System.out.println("Game Over. Thank you for playing!");
         }
+        System.out.println("Game Over. Thank you for playing!");
     }
+}
 

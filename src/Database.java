@@ -19,7 +19,6 @@ public class Database {
         try {
             SqliteClient client = new SqliteClient("demodatabase.sqlite");
             if (client.tableExists("Sessions")) {
-//                currentSession++;
 //                client.executeStatement("DROP TABLE Sessions;");
             }
             client.executeStatement(CREATETABLE);
@@ -29,10 +28,6 @@ public class Database {
 //            client.executeStatement(String.format(INSERT_TEMPLATE, "Anita", 1, 2, 20));
 //            client.executeStatement(String.format(INSERT_TEMPLATE, "Hans", 1, 2, 100));
 
-//            ArrayList<HashMap<String, String>> results = client.executeQuery(String.format(SELECT_BYPLAYERANDSESSION, "Anita", 1));
-//for (HashMap<String, String> map : results) {
-//                System.out.println(map.get("Player") + " hat derzeit:  " + map.get("Score") + " Punkte");
-//            }
         } catch (SQLException ex) {
             System.out.println("Ups! Something went wrong:" + ex.getMessage());
         }

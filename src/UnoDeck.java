@@ -5,6 +5,7 @@ import java.util.Random;
 public class UnoDeck {
 
     //A deck has 108 cards
+
     //1x0 + 2x 1-9 + 2x every special color card + 4x wildColor + 4x drawFour
 
 
@@ -88,7 +89,7 @@ public class UnoDeck {
         }
     }
 
-    //draw a card method -- if the deck is empty, displays an error (that action isn't possible as the deck is empty)
+    //draw a card method -- if the deck is empty, displays an error (that the move isn't possible as the deck is empty)
     public UnoCard drawCard() throws IllegalArgumentException {
         if (isDeckEmpty()) {
             throw new IllegalArgumentException("Cannot draw a card - deck is empty!");

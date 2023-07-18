@@ -29,8 +29,6 @@ public class UnoCard {
     private final Color color;
     private final Value value;
 
-    protected int points; //points per card
-
     protected int numberHandCards;
 
     public UnoCard(Color color, Value value) {
