@@ -150,7 +150,7 @@ public class Game {
                 //if a player has an empty hand, a new row gets added to the database
                 int sessionNumber = Database.generateSessionNumber();
 
-                Database.addRowtoDatabase(player, sessionNumber, roundNumber, totalPointsThisRound);
+                Database.addRowtoDatabase(player, sessionNumber, roundNumber, getWinner());
                 roundNumber++;
                 return true;
             }
@@ -483,10 +483,13 @@ public class Game {
 
     public void displayPoints() {
         for (int i = 0; i < playerIds.length; i++) {
-            //TODO: winningPlayerPoints = playerIds.winningPlayer.getPoints or smt
-
             System.out.println(playerIds[i] + " has " + playerPoints[i] + " points");
         }
+    }
+
+    public int getWinner() {
+        return playerPoints[winningPlayerIndex];
+
     }
 
     public void helpMenu() {
