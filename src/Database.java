@@ -9,27 +9,18 @@ public class Database {
     private static final String SELECT_BYPLAYERANDSESSION = "SELECT Player, SUM(Score) AS Score FROM Sessions WHERE Player = '%1s' AND Session = %2d;";
 
     private static Random rand = new Random();
-    private int round;
 
-
-    private static int currentSession = rand.nextInt(30000); //zahl zwischen 1 -
+    private static int currentSession = rand.nextInt(30000);
 
     public static Map<Integer, Integer> sessionRoundMap = new HashMap<>();
 
-    public int getRound() {
-        return round;
-    }
-
-    public void setRound(int round) {
-        this.round = round;
-    }
 
     public static void createDatabase() {
         try {
             SqliteClient client = new SqliteClient("demodatabase.sqlite");
             if (client.tableExists("Sessions")) {
 //                currentSession++;
-                client.executeStatement("DROP TABLE Sessions;");
+//                client.executeStatement("DROP TABLE Sessions;");
             }
             client.executeStatement(CREATETABLE);
 
@@ -53,8 +44,6 @@ public class Database {
             client = new SqliteClient("demodatabase.sqlite");
             client.executeStatement(String.format(INSERT_TEMPLATE, name, session, round, score));
 
-            //update the round number for the session
-            sessionRoundMap.put(session, round + 1);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

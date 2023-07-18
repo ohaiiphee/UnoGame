@@ -7,6 +7,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Game {
     private int currentPlayer;
 
+    int totalPointsThisRound;
+
+    int winningPlayerIndex; //for calculating points
+
     int winningPlayerPoints;
 
     boolean hasValidCardForPlus4Check = false; //for the +4 challenge check
@@ -14,6 +18,8 @@ public class Game {
     int totalNumberPlayers;
 
     String challengeChoice;
+
+    int roundNumber = 1; //for the datenbank system
 
     //String array of the names of the players
     private String[] playerIds;
@@ -68,7 +74,7 @@ public class Game {
         if (totalNumberPlayers < 2 || totalNumberPlayers > 5) {
             throw new IllegalArgumentException("Number of players must be between 2 and 4.");
         }
-        exitGame= false;
+        exitGame = false;
         deck = new UnoDeck();
         deck.reset();
         deck.shuffle();
@@ -134,7 +140,7 @@ public class Game {
         }
     }
 
-    public boolean getExitGame(){
+    public boolean getExitGame() {
         return exitGame;
     }
 
@@ -143,9 +149,9 @@ public class Game {
             if (hasEmptyHand(player)) {
                 //if a player has an empty hand, a new row gets added to the database
                 int sessionNumber = Database.generateSessionNumber();
-                int roundNumber = 0;
-                roundNumber= Database.sessionRoundMap.get(roundNumber);
-                Database.addRowtoDatabase(player, sessionNumber, roundNumber, winningPlayerPoints );
+
+                Database.addRowtoDatabase(player, sessionNumber, roundNumber, totalPointsThisRound);
+                roundNumber++;
                 return true;
             }
         }
@@ -350,51 +356,27 @@ public class Game {
         pHand.remove(card);
 
         if (hasEmptyHand(this.playerIds[currentPlayer])) {
+            System.out.println(" ");
             System.out.println(this.playerIds[currentPlayer] + " won this round!");
             System.out.println(" ");
 
 
             // Give the winning player points based on the other players' handcards
-            winningPlayerPoints = calculatePoints(this.playerIds[currentPlayer]);
+            totalPointsThisRound = calculatePoints(this.playerIds[currentPlayer]);
 
             System.out.println("Points after this round: ");
             System.out.println(" ");
 
-            int winningPlayerIndex = currentPlayer;
-            playerPoints[winningPlayerIndex] += winningPlayerPoints;
+            winningPlayerIndex = currentPlayer;
+            playerPoints[winningPlayerIndex] += totalPointsThisRound;
             System.out.println(" ");
 
             displayPoints();
             System.out.println(" ");
 
-            if(isGameOver()){
+            if (isGameOver()) {
                 exitGame = true;
             }
-
-
-            //            if (gameExit || game.isGameOver()) {
-//                if (game.checkIfPlayerHas500Points()) { //if a player has reached 500 points
-//                    gameOver = true;
-//                    break;
-//                }
-//                    System.out.println("Next Round? Type Yes");
-//                    Scanner playerinput = new Scanner(System.in);
-//                    String input2 = playerinput.nextLine().toLowerCase();
-//
-//                    if (input2.equalsIgnoreCase("yes")) {
-//                        game.start(game);
-//                        System.out.println("New Round start:");
-//                    } else {
-//                        gameOver = true;
-//                    }
-//                }
-//
-//
-////Continue playing until someone has 0 cards!
-//
-//
-
-
         }
 
         validColor = card.getColor();
@@ -501,6 +483,8 @@ public class Game {
 
     public void displayPoints() {
         for (int i = 0; i < playerIds.length; i++) {
+            //TODO: winningPlayerPoints = playerIds.winningPlayer.getPoints or smt
+
             System.out.println(playerIds[i] + " has " + playerPoints[i] + " points");
         }
     }
